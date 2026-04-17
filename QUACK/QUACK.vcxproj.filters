@@ -8,6 +8,15 @@
     <ClCompile Include="Src\Scene\SceneBase.cpp" />
     <ClCompile Include="Src\Object\Actor\Player.cpp" />
     <ClCompile Include="Src\Object\Common\Stage.cpp" />
+    <ClCompile Include="Src\Manager\Camera.cpp" />
+    <ClCompile Include="Src\Manager\InputManager.cpp" />
+    <ClCompile Include="Src\Manager\SceneManager.cpp" />
+    <ClCompile Include="Src\Common\AnimationController.cpp" />
+    <ClCompile Include="Src\Utility\AsoUtility.cpp" />
+    <ClCompile Include="Src\Utility\MatrixUtility.cpp" />
+    <ClCompile Include="Src\Common\Vector2.cpp" />
+    <ClCompile Include="Src\Common\Quaternion.cpp" />
+    <ClCompile Include="Src\Common\Fader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Application.h" />
@@ -16,5 +25,14 @@
     <ClInclude Include="Src\Scene\SceneBase.h" />
     <ClInclude Include="Src\Object\Actor\Player.h" />
     <ClInclude Include="Src\Object\Common\Stage.h" />
+    <ClInclude Include="Src\Manager\Camera.h" />
+    <ClInclude Include="Src\Manager\InputManager.h" />
+    <ClInclude Include="Src\Manager\SceneManager.h" />
+    <ClInclude Include="Src\Common\AnimationController.h" />
+    <ClInclude Include="Src\Utility\AsoUtility.h" />
+    <ClInclude Include="Src\Utility\MatrixUtility.h" />
+    <ClInclude Include="Src\Common\Vector2.h" />
+    <ClInclude Include="Src\Common\Quaternion.h" />
+    <ClInclude Include="Src\Common\Fader.h" />
   </ItemGroup>
 </Project>
