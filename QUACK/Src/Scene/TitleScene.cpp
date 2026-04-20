@@ -3,6 +3,7 @@
 #include "../Manager/InputManager.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/Camera.h"
+#include "../Application.h"
 #include "TitleScene.h"
 
 TitleScene::TitleScene(void)
@@ -21,6 +22,7 @@ void TitleScene::Init(void)
 	// ’è“_ƒJƒƒ‰
 	sceMng_.GetCamera()->ChangeMode(Camera::MODE::FIXED_POINT);
 
+	image_ = LoadGraph("Data/Image/Title.png");
 }
 
 void TitleScene::Update(void)
@@ -37,6 +39,10 @@ void TitleScene::Update(void)
 
 void TitleScene::Draw(void)
 {
+	DrawRotaGraph(
+		Application::SCREEN_SIZE_X / 2,
+		Application::SCREEN_SIZE_Y / 1.7,
+		1.0f, 0.0, image_, true);
 }
 
 void TitleScene::Release(void)

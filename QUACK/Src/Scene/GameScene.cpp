@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../Object/Common/Stage.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -15,6 +16,9 @@ GameScene::~GameScene(void)
 
 void GameScene::Init(void)
 {
+	// ステージの生成と初期化
+	stage_ = new Stage();
+	stage_->Init();
 }
 
 void GameScene::Update(void)
@@ -31,8 +35,15 @@ void GameScene::Update(void)
 
 void GameScene::Draw(void)
 {
+	// ステージの描画
+	stage_->Draw();
+
 }
 
 void GameScene::Release(void)
 {
+	// ステージの解放と破棄
+	stage_->Release();
+	delete stage_;
+
 }

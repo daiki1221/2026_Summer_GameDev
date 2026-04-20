@@ -38,6 +38,7 @@
     <ClCompile Include="Src\Scene\TitleScene.cpp" />
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
     <ClCompile Include="Src\Utility\MatrixUtility.cpp" />
+    <ClCompile Include="Src\Object\Common\Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Common\FpsController.h" />
@@ -59,6 +60,7 @@
     <ClInclude Include="Src\Scene\TitleScene.h" />
     <ClInclude Include="Src\Utility\AsoUtility.h" />
     <ClInclude Include="Src\Utility\MatrixUtility.h" />
+    <ClInclude Include="Src\Object\Common\Stage.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
