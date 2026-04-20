@@ -1,9 +1,15 @@
 #include <DxLib.h>
+#include <EffekseerForDXLib.h>
+#include "Manager/InputManager.h"
+#include "Manager/ResourceManager.h"
+#include "Manager/SceneManager.h"
 #include "Application.h"
 
 Application* Application::instance_ = nullptr;
 
+const std::string Application::PATH_IMAGE = "Data/Image/";
 const std::string Application::PATH_MODEL = "Data/Model/";
+const std::string Application::PATH_EFFECT = "Data/Effect/";
 
 void Application::CreateInstance(void)
 {
@@ -22,9 +28,13 @@ Application& Application::GetInstance(void)
 void Application::Init(void)
 {
 
+	// アプリケーションの初期設定
+	SetWindowText("3DAction");
+
 	// ウィンドウサイズ
 	SetGraphMode(SCREEN_SIZE_X, SCREEN_SIZE_Y, 32);
 	ChangeWindowMode(true);
+
 	// DxLibの初期化
 	SetUseDirect3DVersion(DX_DIRECT3D_11);
 	isInitFail_ = false;
@@ -33,6 +43,9 @@ void Application::Init(void)
 		isInitFail_ = true;
 		return;
 	}
+
+	// Effekseerの初期化
+	InitEffekseer();
 
 	// 乱数のシード値を設定する
 	DATEDATA date;
@@ -46,17 +59,57 @@ void Application::Init(void)
 
 	// 入力制御初期化
 	SetUseDirectInputFlag(true);
+	InputManager::CreateInstance();
+
+	// リソース管理初期化
+	ResourceManager::CreateInstance();
+
+	// シーン管理初期化
+	SceneManager::CreateInstance();
 
 }
 
 void Application::Run(void)
 {
 
+	InputManager& inputManager = InputManager::GetInstance();
+	SceneManager& sceneManager = SceneManager::GetInstance();
+
+	// ゲームループ
+	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	{
+
+		inputManager.Update();
+		sceneManager.Update();
+
+		sceneManager.Draw();
+
+		ScreenFlip();
+
+	}
+
 }
 
 void Application::Destroy(void)
 {
 
+	InputManager::GetInstance().Destroy();
+	ResourceManager::GetInstance().Destroy();
+	
+	// シーン管理解放
+	SceneManager::GetInstance().Destroy();
+
+	// Effekseerを終了する。
+	Effkseer_End();
+
+	// DxLib終了
+	if (DxLib_End() == -1)
+	{
+		isReleaseFail_ = true;
+	}
+
+	// インスタンスのメモリ解放
+	delete instance_;
 
 }
 
@@ -71,7 +124,20 @@ bool Application::IsReleaseFail(void) const
 }
 
 Application::Application(void)
+	:
+	isInitFail_(false),
+	isReleaseFail_(false)
 {
-	isInitFail_ = false;
-	isReleaseFail_ = false;
+}
+
+void Application::InitEffekseer(void)
+{
+	if (Effekseer_Init(8000) == -1)
+	{
+		DxLib_End();
+	}
+
+	SetChangeScreenModeGraphicsSystemResetFlag(FALSE);
+
+	Effekseer_SetGraphicsDeviceLostCallbackFunctions();
 }

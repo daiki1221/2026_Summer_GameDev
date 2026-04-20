@@ -11,13 +11,15 @@ public:
 	// 状態
 	enum class STATE
 	{
-		NONE,
+		NONE, 
 		FADE_OUT,	// 徐々に暗転
 		FADE_IN		// 徐々に明転
 	};
 
+	// コンストラクタ
 	Fader(void);
 
+	// デストラクタ
 	~Fader(void);
 
 	// 状態の取得
@@ -29,8 +31,13 @@ public:
 	// 指定フェードを開始する
 	void SetFade(STATE state);
 
+	// 初期化
 	void Init(void);
+
+	// 更新
 	void Update(void);
+
+	// 描画
 	void Draw(void);
 
 private:

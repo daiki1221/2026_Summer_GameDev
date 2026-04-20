@@ -1,42 +1,14 @@
 #include <chrono>
 #include <DxLib.h>
+#include <EffekseerForDXLib.h>
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
 #include "Camera.h"
-#include "../Object/Actor/Player.h"
+#include "ResourceManager.h"
 #include "SceneManager.h"
 
 SceneManager* SceneManager::instance_ = nullptr;
-
-
-SceneManager::SceneManager(void)
-{
-
-	//sceneId_ = SCENE_ID::NONE;
-	//waitSceneId_ = SCENE_ID::NONE;
-
-	//scene_ = nullptr;
-	//fader_ = nullptr;
-
-	//isSceneChanging_ = false;
-
-	//// デルタタイム
-	//deltaTime_ = 1.0f / 60.0f;
-
-	//camera_ = nullptr;
-	//miniCamera_ = nullptr;
-
-	////sceneType_ = static_cast<SCENE_ID>(1);				// 現在のシーン
-	////nextSceneType_ = static_cast<SCENE_ID>(1);			// 次のシーン
-	////prevSceneType_ = static_cast<SCENE_ID>(sceneType_);	// 直前のシーン
-	//sceneId_ = SCENE_ID::TITLE;
-	//sceneType_ = SCENE_ID::TITLE;
-	//prevSceneType_ = SCENE_ID::TITLE;
-
-}
-
-
 
 void SceneManager::CreateInstance()
 {
@@ -62,9 +34,11 @@ void SceneManager::Init(void)
 	fader_ = new Fader();
 	fader_->Init();
 
-	scene_ = new GameScene();
-	scene_->Init();
+	// カメラ
+	camera_ = new Camera();
+	camera_->Init();
 
+	// 画面遷移中判定
 	isSceneChanging_ = false;
 
 	// デルタタイム
@@ -76,32 +50,15 @@ void SceneManager::Init(void)
 	// 初期シーンの設定
 	DoChangeScene(SCENE_ID::TITLE);
 
-	sceneType_ = SCENE_ID::TITLE;
-	prevSceneType_ = SCENE_ID::TITLE;
-
-
 }
-
-void SceneManager::OpenMenu()
-{
-	prevSceneType_ = sceneType_; // 現在のシーンを記録 
-	ChangeScene(SCENE_ID::MENU);
-}
-
-void SceneManager::ReturnPrevScene()
-{
-	skipReset_ = true;
-	ChangeScene(prevSceneType_);
-}
-
 
 void SceneManager::Init3D(void)
 {
 
 	// 背景色設定
 	SetBackgroundColor(
-		BACKGROUND_COLOR_R,
-		BACKGROUND_COLOR_G,
+		BACKGROUND_COLOR_R, 
+		BACKGROUND_COLOR_G, 
 		BACKGROUND_COLOR_B);
 
 	// Zバッファを有効にする
@@ -115,9 +72,14 @@ void SceneManager::Init3D(void)
 
 	// ライトの設定
 	SetUseLighting(true);
+	
+	// ライトの設定
+	ChangeLightTypeDir({ 0.3f, -0.7f, 0.8f });
 
-	// 正面から斜め下に向かったライト
-	ChangeLightTypeDir({ 0.00f, -1.00f, 1.00f });
+	// フォグ設定
+	SetFogEnable(true);
+	SetFogColor(5, 5, 5);
+	SetFogStartEnd(10000.0f, 20000.0f);
 
 }
 
@@ -135,14 +97,27 @@ void SceneManager::Update(void)
 		std::chrono::duration_cast<std::chrono::nanoseconds>(nowTime - preTime_).count() / 1000000000.0);
 	preTime_ = nowTime;
 
+	// フェード機能の更新
+	fader_->Update();
+	if (isSceneChanging_)
+	{
+		// フェード状態の切替処理
+		Fade();
+	}
+	else
+	{
+		// 各シーンの更新処理
+		scene_->Update();
+	}
 
-
+	// カメラ更新
+	camera_->Update();
 
 }
 
 void SceneManager::Draw(void)
 {
-
+	
 	// 描画先グラフィック領域の指定
 	// (３Ｄ描画で使用するカメラの設定などがリセットされる)
 	SetDrawScreen(DX_SCREEN_BACK);
@@ -150,10 +125,21 @@ void SceneManager::Draw(void)
 	// 画面を初期化
 	ClearDrawScreen();
 
+	// カメラ設定
+	camera_->SetBeforeDraw();
+
+	// Effekseerにより再生中のエフェクトを更新する。
+	UpdateEffekseer3D();
+
 	// 各シーンの描画処理
 	scene_->Draw();
 
+	// カメラ描画
+	camera_->DrawDebug();
 
+	// Effekseerにより再生中のエフェクトを描画する。
+	DrawEffekseer3D();
+	
 	// 暗転・明転
 	fader_->Draw();
 
@@ -163,17 +149,20 @@ void SceneManager::Destroy(void)
 {
 
 	// シーンの解放
-	scene_->Release();
-	delete scene_;
+	if (scene_ != nullptr)
+	{
+		delete scene_;
+	}
 
 	// フェード機能の解放
 	delete fader_;
 
+	camera_->Release();
+	delete camera_;
 
 
 	// インスタンスのメモリ解放
 	delete instance_;
-	instance_ = nullptr;
 
 }
 
@@ -197,8 +186,8 @@ SceneManager::SCENE_ID SceneManager::GetSceneID(void)
 
 float SceneManager::GetDeltaTime(void) const
 {
-	//return 1.0f / 60.0f;
-	return deltaTime_;
+	return 1.0f / 60.0f;
+	//return deltaTime_;
 }
 
 Camera* SceneManager::GetCamera(void) const
@@ -206,11 +195,23 @@ Camera* SceneManager::GetCamera(void) const
 	return camera_;
 }
 
-const std::vector<Food*>& SceneManager::GetFoodList() const
+SceneManager::SceneManager(void)
 {
-	return foodList_;
-}
 
+	sceneId_ = SCENE_ID::NONE;
+	waitSceneId_ = SCENE_ID::NONE;
+
+	scene_ = nullptr;
+	fader_ = nullptr;
+
+	isSceneChanging_ = false;
+
+	// デルタタイム
+	deltaTime_ = 1.0f / 60.0f;
+
+	camera_ = nullptr;
+
+}
 
 void SceneManager::ResetDeltaTime(void)
 {
@@ -221,14 +222,15 @@ void SceneManager::ResetDeltaTime(void)
 void SceneManager::DoChangeScene(SCENE_ID sceneId)
 {
 
+	// リソースの解放
+	ResourceManager::GetInstance().Release();
+
 	// シーンを変更する
 	sceneId_ = sceneId;
-	sceneType_ = sceneId_;
 
 	// 現在のシーンを解放
 	if (scene_ != nullptr)
 	{
-		scene_->Release();
 		delete scene_;
 	}
 
@@ -240,7 +242,6 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	case SCENE_ID::GAME:
 		scene_ = new GameScene();
 		break;
-
 	}
 
 	// 各シーンの初期化
@@ -280,3 +281,5 @@ void SceneManager::Fade(void)
 	}
 
 }
+
+

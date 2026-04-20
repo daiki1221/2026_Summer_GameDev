@@ -16,4 +16,3 @@ public:
 	~Vector2(void);
 
 };
-

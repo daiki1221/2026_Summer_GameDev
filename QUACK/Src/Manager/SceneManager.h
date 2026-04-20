@@ -1,13 +1,9 @@
 #pragma once
-#include <vector>
 #include <chrono>
-
+#include <DxLib.h>
 class SceneBase;
 class Fader;
 class Camera;
-class MiniCamera;
-class Food;
-class Player;
 
 class SceneManager
 {
@@ -27,11 +23,9 @@ public:
 	{
 		NONE,
 		TITLE,
-		GAME,
-		MENU,
-		RESULT,
+		GAME
 	};
-
+	
 	// インスタンスの生成
 	static void CreateInstance(void);
 
@@ -40,7 +34,7 @@ public:
 
 	// 初期化
 	void Init(void);
-
+	
 	// 3Dの初期化
 	void Init3D(void);
 
@@ -65,28 +59,7 @@ public:
 	// カメラの取得
 	Camera* GetCamera(void) const;
 
-	const std::vector<Food*>& GetFoodList() const;
-
-	// 巣に到達したときの処理
-	void OnReachNest(void);
-
-	void GameOver(void);
-
-	void OpenMenu(); // メニューを開く
-	void ReturnPrevScene(); // 直前のシーンに戻る
-	SCENE_ID prevSceneType_;                      // 直前のシーン
-	bool skipReset_;
-
-	
-
 private:
-
-
-
-	SCENE_ID sceneType_;					// 現在のシーン
-	SCENE_ID nextSceneType_;				// 次のシーン
-
-	std::vector<Food*> foodList_;
 
 	// 静的インスタンス
 	static SceneManager* instance_;
@@ -103,22 +76,13 @@ private:
 	// カメラ
 	Camera* camera_;
 
-	// ミニカメラ
-	MiniCamera* miniCamera_;
-
-	Food* food_;
-
-	Player* player_;
-
 	// シーン遷移中判定
 	bool isSceneChanging_;
-
 
 	// デルタタイム
 	std::chrono::system_clock::time_point preTime_;
 	float deltaTime_;
-
-
+	
 	// デフォルトコンストラクタをprivateにして、
 	// 外部から生成できない様にする
 	SceneManager(void);

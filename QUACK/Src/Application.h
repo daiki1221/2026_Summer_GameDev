@@ -7,8 +7,8 @@ class Application
 public:
 
 	// スクリーンサイズ
-	static constexpr int SCREEN_SIZE_X = 1024;
-	static constexpr int SCREEN_SIZE_Y = 640;
+	static constexpr int SCREEN_SIZE_X = 1280;
+	static constexpr int SCREEN_SIZE_Y = 720;
 
 	// データパス関連
 	//-------------------------------------------
@@ -16,6 +16,10 @@ public:
 	static const std::string PATH_IMAGE;
 	static const std::string PATH_MODEL;
 	static const std::string PATH_EFFECT;
+
+	static const std::string PATH_KEY_CONFIG;
+	static const std::string PATH_KEY_CONFIG_GAMEPAD;
+	static const std::string PATH_KEY_CONFIG_KEYBOARD;
 	//-------------------------------------------
 
 	// インスタンスを明示的に生成
@@ -59,5 +63,8 @@ private:
 
 	// デストラクタも同様
 	~Application(void) = default;
+
+	// エフェクシアの初期化
+	void InitEffekseer(void);
 
 };
