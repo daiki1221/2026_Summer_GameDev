@@ -11,6 +11,10 @@ public:
 	// リソース名
 	enum class SRC
 	{
+		PLAYER,
+		PLAYER_SHADOW,
+		MAIN_PLANET
+
 	};
 
 	// 明示的にインステンスを生成する

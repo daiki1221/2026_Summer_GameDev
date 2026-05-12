@@ -45,6 +45,3 @@ void TitleScene::Draw(void)
 		1.0f, 0.0, image_, true);
 }
 
-void TitleScene::Release(void)
-{
-}

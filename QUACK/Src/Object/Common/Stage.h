@@ -1,29 +1,74 @@
 #pragma once
+#include <map>
+#include<memory>
+#include "../Common/Transform.h"
+class ResourceManager;
+class WarpStar;
+class Planet;
+class Player;
+
 class Stage
 {
+
 public:
 
+	// ステージの切り替え間隔
+	static constexpr float TIME_STAGE_CHANGE = 1.0f;
+
+	// ステージ名
+	enum class NAME
+	{
+		MAIN_PLANET,
+		FALL_PLANET,
+		FLAT_PLANET_BASE,
+		FLAT_PLANET_ROT01,
+		FLAT_PLANET_ROT02,
+		FLAT_PLANET_ROT03,
+		FLAT_PLANET_ROT04,
+		FLAT_PLANET_FIXED01,
+		FLAT_PLANET_FIXED02,
+		PLANET10,
+		LAST_STAGE,
+		SPECIAL_STAGE
+	};
+
 	// コンストラクタ
-	Stage(void);
+	Stage(std::weak_ptr<Player> player);
 
 	// デストラクタ
 	~Stage(void);
 
-	// 初期化
 	void Init(void);
-
-	// 更新
 	void Update(void);
-
-	// 描画
 	void Draw(void);
 
-	// 解放
-	void Release(void);
+	// ステージ変更
+	void ChangeStage(NAME type);
+
+	// 対象ステージを取得
+	Planet* GetPlanet(NAME type);
+
 private:
 
-	// ステージモデルのハンドルID
-	int modelId_;
+	// シングルトン参照
+	ResourceManager& resMng_;
+
+	std::weak_ptr<Player> player_;
+
+	// ステージアクティブになっている惑星の情報
+	NAME activeName_;
+	Planet* activePlanet_;
+
+	// 惑星
+	std::map<NAME, Planet*> planets_;
+
+
+	// 空のPlanet
+	Planet* nullPlanet = nullptr;
+
+	float step_;
+
+	// 最初の惑星
+	void MakeMainStage(void);
 
 };
-

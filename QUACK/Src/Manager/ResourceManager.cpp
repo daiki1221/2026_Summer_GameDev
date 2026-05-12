@@ -31,6 +31,21 @@ void ResourceManager::Init(void)
 
 	Resource* res;
 
+	// プレイヤー
+	res = new RES(RES_T::MODEL, PATH_MDL + "Player/duck.mv1");
+	resourcesMap_.emplace(SRC::PLAYER, res);
+
+	// プレイヤー影
+	res = new RES(RES_T::IMG, PATH_IMG + "Shadow.png");
+	resourcesMap_.emplace(SRC::PLAYER_SHADOW, res);
+
+		// メイン惑星
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage.mv1");
+	resourcesMap_.emplace(SRC::MAIN_PLANET, res);
+
+
+
+
 }
 
 void ResourceManager::Release(void)

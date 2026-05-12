@@ -1,6 +1,8 @@
 #pragma once
+#include <memory>
 #include "SceneBase.h"
 class Stage;
+class Player;
 
 class GameScene : public SceneBase
 {
@@ -22,12 +24,12 @@ public:
 	// 描画
 	void Draw(void) override;
 
-	// 解放
-	void Release(void) override;
+
 
 private:
 
 	// ステージ
-	Stage* stage_;
+	std::unique_ptr<Stage> stage_;
 
+	std::shared_ptr<Player> player_;
 };

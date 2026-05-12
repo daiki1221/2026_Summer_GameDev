@@ -3,46 +3,12 @@
 #include "ActorBase.h"
 
 ActorBase::ActorBase(void)
-	: 
-	resMng_(ResourceManager::GetInstance()),
-	scnMng_(SceneManager::GetInstance()),
-	transform_()
+	: resMng_(ResourceManager::GetInstance()),
+	scnMng_(SceneManager::GetInstance())
 {
 }
 
 ActorBase::~ActorBase(void)
-{
-}
-
-void ActorBase::Init(void)
-{
-
-	// リソースロード
-	InitLoad();
-
-	// Transform初期化
-	InitTransform();
-
-	// 衝突判定の初期化
-	InitCollider();
-
-	// アニメーションの初期化
-	InitAnimation();
-
-	// 初期化後の個別処理
-	InitPost();
-
-}
-
-void ActorBase::Draw(void)
-{
-	if (transform_.modelId != -1)
-	{
-		MV1DrawModel(transform_.modelId);
-	}
-}
-
-void ActorBase::Release(void)
 {
 	transform_.Release();
 }

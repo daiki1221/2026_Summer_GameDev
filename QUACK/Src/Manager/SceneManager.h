@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include <chrono>
 #include <DxLib.h>
 class SceneBase;
@@ -67,14 +68,15 @@ private:
 	SCENE_ID sceneId_;
 	SCENE_ID waitSceneId_;
 
-	// フェード
-	Fader* fader_;
-
 	// 各種シーン
-	SceneBase* scene_;
+	std::unique_ptr<SceneBase> scene_;
+
+	// フェード
+	std::unique_ptr<Fader> fader_;
 
 	// カメラ
-	Camera* camera_;
+	std::unique_ptr<Camera> camera_;
+
 
 	// シーン遷移中判定
 	bool isSceneChanging_;

@@ -21,8 +21,7 @@ public:
 	// •`‰æ
 	void Draw(void) override;
 
-	// ‰ð•ú
-	void Release(void) override;
+	
 
 private:
 

@@ -1,6 +1,8 @@
 #pragma once
 #include <DxLib.h>
+#include <memory>
 #include "../../Common/Quaternion.h"
+#include "Collider.h"
 
 /// <summary>
 /// モデル制御の基本情報
@@ -13,6 +15,13 @@ class Transform
 
 public:
 
+	// コンストラクタ
+	Transform(void);
+	Transform(int model);
+
+	// デストラクタ
+	~Transform(void);
+
 	// モデルのハンドルID
 	int modelId;
 
@@ -24,7 +33,6 @@ public:
 	VECTOR pos;
 	VECTOR localPos;
 
-	// 行列
 	MATRIX matScl;
 	MATRIX matRot;
 	MATRIX matPos;
@@ -35,21 +43,19 @@ public:
 	// ローカル回転
 	Quaternion quaRotLocal;
 
+	// コライダ
+	Collider* collider_;
 
-	// コンストラクタ
-	Transform(void);
-
-	// デストラクタ
-	~Transform(void);
-
-	// モデル制御の基本情報更新
+	/// <summary>
+	/// モデル制御の基本情報更新
+	/// </summary>
+	/// <param name=""></param>
 	void Update(void);
-	
-	// 解放
+
 	void Release(void);
 
-	// モデルのハンドルIDを設定
 	void SetModel(int modelHId);
+	void MakeCollider(Collider::TYPE type);
 
 	// 前方方向を取得
 	VECTOR GetForward(void) const;
@@ -70,6 +76,6 @@ public:
 	VECTOR GetDown(void) const;
 
 	// 対象方向を取得
-	VECTOR GetDir(const VECTOR& dir) const;
+	VECTOR GetDir(const VECTOR& vec) const;
 
 };

@@ -3,19 +3,39 @@
 #include "Transform.h"
 
 Transform::Transform(void)
-	:
-	modelId(-1),
-	scl(AsoUtility::VECTOR_ONE),
-	rot(AsoUtility::VECTOR_ZERO),
-	pos(AsoUtility::VECTOR_ZERO),
-	localPos(AsoUtility::VECTOR_ZERO),
-	matScl(MGetIdent()),
-	matRot(MGetIdent()),
-	matPos(MGetIdent()),
-	quaRot(Quaternion()),
-	quaRotLocal(Quaternion())
-
 {
+	modelId = -1;
+
+	scl = AsoUtility::VECTOR_ONE;
+	rot = AsoUtility::VECTOR_ZERO;
+	pos = AsoUtility::VECTOR_ZERO;
+	localPos = AsoUtility::VECTOR_ZERO;
+
+	matScl = MGetIdent();
+	matRot = MGetIdent();
+	matPos = MGetIdent();
+	quaRot = Quaternion();
+	quaRotLocal = Quaternion();
+
+	collider_ = nullptr;
+}
+
+Transform::Transform(int model)
+{
+	modelId = model;
+
+	scl = AsoUtility::VECTOR_ONE;
+	rot = AsoUtility::VECTOR_ZERO;
+	pos = AsoUtility::VECTOR_ZERO;
+	localPos = AsoUtility::VECTOR_ZERO;
+
+	matScl = MGetIdent();
+	matRot = MGetIdent();
+	matPos = MGetIdent();
+	quaRot = Quaternion();
+	quaRotLocal = Quaternion();
+
+	collider_ = nullptr;
 }
 
 Transform::~Transform(void)
@@ -48,15 +68,38 @@ void Transform::Update(void)
 		MV1SetMatrix(modelId, mat);
 	}
 
+	// è’ìÀîªíËÇÃçXêV
+	if (collider_ != nullptr)
+	{
+		MV1RefreshCollInfo(modelId);
+	}
+
 }
 
 void Transform::Release(void)
 {
+	if (collider_ != nullptr)
+	{
+
+	}
 }
 
 void Transform::SetModel(int model)
 {
 	modelId = model;
+}
+
+void Transform::MakeCollider(Collider::TYPE type)
+{
+
+	if (modelId == -1)
+	{
+		return;
+	}
+
+	collider_ = new Collider(type, modelId);
+	int ret = MV1SetupCollInfo(modelId, -1, 1, 1, 1);
+
 }
 
 VECTOR Transform::GetForward(void) const
@@ -89,7 +132,7 @@ VECTOR Transform::GetDown(void) const
 	return GetDir(AsoUtility::DIR_D);
 }
 
-VECTOR Transform::GetDir(const VECTOR& dir) const
+VECTOR Transform::GetDir(const VECTOR& vec) const
 {
-	return quaRot.PosAxis(dir);
+	return quaRot.PosAxis(vec);
 }

@@ -1,5 +1,6 @@
 #include <chrono>
 #include <DxLib.h>
+#include <memory>
 #include <EffekseerForDXLib.h>
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
@@ -31,11 +32,11 @@ void SceneManager::Init(void)
 	waitSceneId_ = SCENE_ID::NONE;
 
 	// フェード機能の初期化
-	fader_ = new Fader();
+	fader_ = std::make_unique<Fader>();
 	fader_->Init();
 
 	// カメラ
-	camera_ = new Camera();
+	camera_ = std::make_unique<Camera>();
 	camera_->Init();
 
 	// 画面遷移中判定
@@ -134,8 +135,8 @@ void SceneManager::Draw(void)
 	// 各シーンの描画処理
 	scene_->Draw();
 
-	// カメラ描画
-	camera_->DrawDebug();
+	// カメラ設定
+	camera_->Draw();
 
 	// Effekseerにより再生中のエフェクトを描画する。
 	DrawEffekseer3D();
@@ -151,15 +152,8 @@ void SceneManager::Destroy(void)
 	// シーンの解放
 	if (scene_ != nullptr)
 	{
-		delete scene_;
+		
 	}
-
-	// フェード機能の解放
-	delete fader_;
-
-	camera_->Release();
-	delete camera_;
-
 
 	// インスタンスのメモリ解放
 	delete instance_;
@@ -192,7 +186,7 @@ float SceneManager::GetDeltaTime(void) const
 
 Camera* SceneManager::GetCamera(void) const
 {
-	return camera_;
+	return camera_.get();
 }
 
 SceneManager::SceneManager(void)
@@ -231,16 +225,16 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	// 現在のシーンを解放
 	if (scene_ != nullptr)
 	{
-		delete scene_;
+		
 	}
 
 	switch (sceneId_)
 	{
 	case SCENE_ID::TITLE:
-		scene_ = new TitleScene();
+		scene_ = std::make_unique<TitleScene>();
 		break;
 	case SCENE_ID::GAME:
-		scene_ = new GameScene();
+		scene_ = std::make_unique<GameScene>();
 		break;
 	}
 
