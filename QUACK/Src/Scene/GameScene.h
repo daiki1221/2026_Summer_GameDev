@@ -3,6 +3,7 @@
 #include "SceneBase.h"
 class Stage;
 class Player;
+class Duckling;
 
 class GameScene : public SceneBase
 {
@@ -32,4 +33,6 @@ private:
 	std::unique_ptr<Stage> stage_;
 
 	std::shared_ptr<Player> player_;
+
+	std::unique_ptr<Duckling> duckling_;
 };

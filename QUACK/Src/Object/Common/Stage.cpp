@@ -20,7 +20,12 @@ Stage::Stage(std::weak_ptr<Player> player)
 
 Stage::~Stage(void)
 {
-
+	// ˜f¯
+	for (auto pair : planets_)
+	{
+		delete pair.second;
+	}
+	planets_.clear();
 
 }
 
@@ -34,11 +39,20 @@ void Stage::Init(void)
 
 void Stage::Update(void)
 {
+	// ˜f¯
+	for (const auto& s : planets_)
+	{
+		s.second->Update();
+	}
 }
 
 void Stage::Draw(void)
 {
-
+	// ˜f¯
+	for (const auto& s : planets_)
+	{
+		s.second->Draw();
+	}
 }
 
 

@@ -8,6 +8,7 @@
 #include "../Object/Common/Stage.h"
 #include "../Object/Actor/Player.h"
 #include "../Object/Actor/Planet.h"
+#include "../Object/Actor/Duckling.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -24,6 +25,9 @@ void GameScene::Init(void)
 {
 	player_ = std::make_shared<Player>();
 	player_->Init();
+
+	duckling_ = std::make_unique<Duckling>();
+	duckling_->Init();
 
 	// ステージの生成と初期化
 	stage_ = std::make_unique<Stage>(player_);
@@ -49,6 +53,8 @@ void GameScene::Update(void)
 	stage_->Update();
 
 	player_->Update();
+
+	duckling_->Update();
 	
 }
 
@@ -58,6 +64,8 @@ void GameScene::Draw(void)
 	stage_->Draw();
 
 	player_->Draw();
+
+	duckling_->Draw();
 
 }
 

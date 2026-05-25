@@ -13,7 +13,8 @@ public:
 	{
 		PLAYER,
 		PLAYER_SHADOW,
-		MAIN_PLANET
+		MAIN_PLANET,
+		DUCKLING,
 
 	};
 

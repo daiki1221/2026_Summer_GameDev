@@ -12,11 +12,11 @@
 #include "../Common/Collider.h"
 #include "Planet.h"
 #include "Player.h"
+#include "Duckling.h"
 
-Player::Player(void)
+
+Duckling::Duckling(void)
 {
-	animationController_ = nullptr;
-	state_ = STATE::NONE;
 
 	speed_ = 0.0f;
 	moveDir_ = AsoUtility::VECTOR_ZERO;
@@ -38,62 +38,32 @@ Player::Player(void)
 	imgShadow_ = -1;
 
 	capsule_ = nullptr;
-
 }
 
-Player::~Player(void)
+Duckling::~Duckling(void)
 {
 }
 
-void Player::Init(void)
+void Duckling::Init(void)
 {
 	transform_.SetModel(resMng_.LoadModelDuplicate(
-		ResourceManager::SRC::PLAYER));
-	transform_.scl = AsoUtility::VECTOR_ONE;
-	transform_.pos = { 0.0f, -30.0f, 0.0f };
+		ResourceManager::SRC::DUCKLING));
+	transform_.scl = { 0.3f, 0.3f, 0.3f };
+	transform_.pos = { -50.0f, -120.0f, 1000.0f };
 	transform_.quaRot = Quaternion();
 	transform_.quaRotLocal =
 		Quaternion::Euler({ 0.0f, AsoUtility::Deg2RadF(180.0f), 0.0f });
 	transform_.Update();
 
-	// アニメーションの設定
-	InitAnimation();
-
-
-	// カプセルコライダ
-	capsule_ = std::make_unique<Capsule>(transform_);
-	capsule_->SetLocalPosTop({ 0.0f, 110.0f, 0.0f });
-	capsule_->SetLocalPosDown({ 0.0f, 30.0f, 0.0f });
-	capsule_->SetRadius(20.0f);
-
-	// 丸影画像
-	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
-
-	// 初期状態
-	ChangeState(STATE::PLAY);
 }
 
-void Player::Update(void)
+void Duckling::Update(void)
 {
-	// 更新ステップ
-	switch (state_)
-	{
-	case Player::STATE::NONE:
-		UpdateNone();
-		break;
-	case Player::STATE::PLAY:
-		UpdatePlay();
-		break;
-	}
-
 	// モデル制御更新
 	transform_.Update();
-
-	// アニメーション再生
-	//animationController_->Update();
 }
 
-void Player::Draw(void)
+void Duckling::Draw(void)
 {
 	// モデルの描画
 	MV1DrawModel(transform_.modelId);
@@ -102,69 +72,44 @@ void Player::Draw(void)
 	DrawShadow();
 }
 
-void Player::AddCollider(Collider* collider)
+void Duckling::AddCollider(Collider* collider)
 {
 	colliders_.push_back(collider);
 }
 
-void Player::ClearCollider(void)
+void Duckling::ClearCollider(void)
 {
 	colliders_.clear();
 }
 
-const Capsule* Player::GetCapsule(void) const
+const Capsule* Duckling::GetCapsule(void) const
 {
 	return capsule_.get();
 }
 
-void Player::InitAnimation(void)
+void Duckling::InitAnimation(void)
 {
 
-	std::string path = Application::PATH_MODEL + "Player/";
+	/*std::string path = Application::PATH_MODEL + "Duckling/";
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
 	animationController_->Add((int)ANIM_TYPE::IDLE, path + "Idle.mv1", 20.0f);
 	animationController_->Add((int)ANIM_TYPE::RUN, path + "Run.mv1", 20.0f);
 	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "FastRun.mv1", 20.0f);
 	animationController_->Add((int)ANIM_TYPE::JUMP, path + "Jump.mv1", 60.0f);
-	/*animationController_->Add((int)ANIM_TYPE::WARP_PAUSE, path + "WarpPose.mv1", 60.0f);
+	animationController_->Add((int)ANIM_TYPE::WARP_PAUSE, path + "WarpPose.mv1", 60.0f);
 	animationController_->Add((int)ANIM_TYPE::FLY, path + "Flying.mv1", 60.0f);
 	animationController_->Add((int)ANIM_TYPE::FALLING, path + "Falling.mv1", 80.0f);
 	animationController_->Add((int)ANIM_TYPE::VICTORY, path + "Victory.mv1", 60.0f);
-	*/
-	animationController_->Play((int)ANIM_TYPE::IDLE);
+	
+	animationController_->Play((int)ANIM_TYPE::IDLE);*/
 
 }
 
-void Player::ChangeState(STATE state)
-{
-	// 状態変更
-	state_ = state;
-
-	// 各状態遷移の初期処理
-	switch (state_)
-	{
-	case Player::STATE::NONE:
-		ChangeStateNone();
-		break;
-	case Player::STATE::PLAY:
-		ChangeStatePlay();
-		break;
-	}
-}
-
-void Player::ChangeStateNone(void)
+void Duckling::UpdateNone(void)
 {
 }
 
-void Player::ChangeStatePlay(void)
-{
-}
-
-void Player::UpdateNone(void)
-{
-}
-
-void Player::UpdatePlay(void)
+void Duckling::UpdatePlay(void)
 {
 
 	// 移動処理
@@ -187,7 +132,7 @@ void Player::UpdatePlay(void)
 
 }
 
-void Player::DrawShadow(void)
+void Duckling::DrawShadow(void)
 {
 
 	float PLAYER_SHADOW_HEIGHT = 300.0f;
@@ -283,139 +228,29 @@ void Player::DrawShadow(void)
 
 
 
-const VECTOR& Player::GetPos(void) const
+const VECTOR& Duckling::GetPos(void) const
 {
 	return transform_.pos;
 }
 
-const Transform* Player::GetTransform() const
+const Transform* Duckling::GetTransform() const
 {
 	return &transform_;
 }
 
-void Player::ProcessMove(void)
+void Duckling::ProcessMove(void)
 {
 
-	auto& ins = InputManager::GetInstance();
-
-	// 移動量をゼロ
-	movePow_ = AsoUtility::VECTOR_ZERO;
-
-	// X軸回転を除いた、重力方向に垂直なカメラ角度(XZ平面)を取得
-	Quaternion cameraRot = SceneManager::GetInstance().GetCamera()->GetQuaRotOutX();
-
-	// 回転したい角度
-	double rotRad = 0;
-
-	VECTOR dir = AsoUtility::VECTOR_ZERO;
-
-	// カメラ方向に前進したい
-	if (ins.IsNew(KEY_INPUT_W))
-	{
-		rotRad = AsoUtility::Deg2RadD(0.0);
-		dir = cameraRot.GetForward();
-	}
-
-	// カメラ方向から後退したい
-	if (ins.IsNew(KEY_INPUT_S))
-	{
-		rotRad = AsoUtility::Deg2RadD(180.0);
-		dir = cameraRot.GetBack();
-	}
-
-	// カメラ方向から右側へ移動したい
-	if (ins.IsNew(KEY_INPUT_D))
-	{
-		rotRad = AsoUtility::Deg2RadD(90.0);
-		dir = cameraRot.GetRight();
-	}
-
-	// カメラ方向から左側へ移動したい
-	if (ins.IsNew(KEY_INPUT_A))
-	{
-		rotRad = AsoUtility::Deg2RadD(270.0);
-		dir = cameraRot.GetLeft();
-	}
-
-	if (!AsoUtility::EqualsVZero(dir) && (isJump_ || IsEndLanding())) {
-
-		// 移動処理
-		speed_ = SPEED_MOVE;
-		if (ins.IsNew(KEY_INPUT_RSHIFT))
-		{
-			speed_ = SPEED_RUN;
-		}
-		moveDir_ = dir;
-		movePow_ = VScale(dir, speed_);
-
-		// 回転処理
-		SetGoalRotate(rotRad);
-
-		if (!isJump_ && IsEndLanding())
-		{
-			// アニメーション
-			if (ins.IsNew(KEY_INPUT_RSHIFT))
-			{
-				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
-			}
-			else
-			{
-				animationController_->Play((int)ANIM_TYPE::RUN);
-			}
-		}
-
-	}
-	else
-	{
-		if (!isJump_ && IsEndLanding())
-		{
-			animationController_->Play((int)ANIM_TYPE::IDLE);
-		}
-	}
 
 }
 
-void Player::ProcessJump(void)
+void Duckling::ProcessJump(void)
 {
-	bool isHit = CheckHitKey(KEY_INPUT_BACKSLASH);
 
-	// ジャンプ
-	if (isHit && (isJump_ || IsEndLanding()))
-	{
-
-		if (!isJump_)
-		{
-			// 制御無しジャンプ
-			//mAnimationController->Play((int)ANIM_TYPE::JUMP);
-			// ループしないジャンプ
-			//mAnimationController->Play((int)ANIM_TYPE::JUMP, false);
-			// 切り取りアニメーション
-			//mAnimationController->Play((int)ANIM_TYPE::JUMP, false, 13.0f, 24.0f);
-			// 無理やりアニメーション
-			animationController_->Play((int)ANIM_TYPE::JUMP, true, 13.0f, 25.0f);
-			animationController_->SetEndLoop(23.0f, 25.0f, 5.0f);
-		}
-
-		isJump_ = true;
-
-		// ジャンプの入力受付時間をヘラス
-		stepJump_ += scnMng_.GetDeltaTime();
-		if (stepJump_ < TIME_JUMP_IN)
-		{
-			jumpPow_ = VScale(AsoUtility::DIR_U, POW_JUMP);
-		}
-
-	}
-
-	// ボタンを離したらジャンプ力に加算しない
-	if (!isHit)
-	{
-		stepJump_ = TIME_JUMP_IN;
-	}
 
 }
 
-void Player::SetGoalRotate(double rotRad)
+void Duckling::SetGoalRotate(double rotRad)
 {
 	VECTOR cameraRot = SceneManager::GetInstance().GetCamera()->GetAngles();
 	Quaternion axis = Quaternion::AngleAxis((double)cameraRot.y + rotRad, AsoUtility::AXIS_Y);
@@ -432,7 +267,7 @@ void Player::SetGoalRotate(double rotRad)
 	goalQuaRot_ = axis;
 }
 
-void Player::Rotate(void)
+void Duckling::Rotate(void)
 {
 	stepRotTime_ -= scnMng_.GetDeltaTime();
 
@@ -441,7 +276,7 @@ void Player::Rotate(void)
 		playerRotY_, goalQuaRot_, (TIME_ROT - stepRotTime_) / TIME_ROT);
 }
 
-void Player::Collision(void)
+void Duckling::Collision(void)
 {
 	// 現在座標を起点に移動後座標を決める
 	movedPos_ = VAdd(transform_.pos, movePow_);
@@ -456,7 +291,7 @@ void Player::Collision(void)
 	transform_.pos = movedPos_;
 }
 
-void Player::CollisionGravity(void)
+void Duckling::CollisionGravity(void)
 {
 	// ジャンプ量を加算
 	movedPos_ = VAdd(movedPos_, jumpPow_);
@@ -493,22 +328,14 @@ void Player::CollisionGravity(void)
 			jumpPow_ = AsoUtility::VECTOR_ZERO;
 			stepJump_ = 0.0f;
 
-			if (isJump_)
-			{
-				// 着地モーション
-				animationController_->Play(
-					(int)ANIM_TYPE::JUMP, false, 29.0f, 45.0f, false, true);
-			}
-
-			isJump_ = false;
-
+			
 		}
 
 	}
 
 }
 
-void Player::CollisionCapsule(void)
+void Duckling::CollisionCapsule(void)
 {
 	// 現在座標と移動後座標
 	VECTOR startPos = transform_.pos;
@@ -519,59 +346,59 @@ void Player::CollisionCapsule(void)
 	float dist = VSize(delta);
 
 	// 移動がほぼ無い場合は従来通り一回だけ判定
-	
+
 
 		// カプセルを移動させる
-		Transform trans = Transform(transform_);
-		trans.pos = movedPos_;
-		trans.Update();
-		Capsule cap = Capsule(*capsule_, trans);
+	Transform trans = Transform(transform_);
+	trans.pos = movedPos_;
+	trans.Update();
+	Capsule cap = Capsule(*capsule_, trans);
 
-		// カプセルとの衝突判定
-		for (const auto c : colliders_)
+	// カプセルとの衝突判定
+	for (const auto c : colliders_)
+	{
+
+		auto hits = MV1CollCheck_Capsule(
+			c->modelId_, -1,
+			cap.GetPosTop(), cap.GetPosDown(), cap.GetRadius());
+
+		for (int i = 0; i < hits.HitNum; i++)
 		{
 
-			auto hits = MV1CollCheck_Capsule(
-				c->modelId_, -1,
-				cap.GetPosTop(), cap.GetPosDown(), cap.GetRadius());
+			auto hit = hits.Dim[i];
 
-			for (int i = 0; i < hits.HitNum; i++)
+			for (int tryCnt = 0; tryCnt < 10; tryCnt++)
 			{
 
-				auto hit = hits.Dim[i];
+				int pHit = HitCheck_Capsule_Triangle(
+					cap.GetPosTop(), cap.GetPosDown(), cap.GetRadius(),
+					hit.Position[0], hit.Position[1], hit.Position[2]);
 
-				for (int tryCnt = 0; tryCnt < 10; tryCnt++)
+				if (pHit)
 				{
+					movedPos_ = VAdd(movedPos_, VScale(hit.Normal, 0.1f));
+					// カプセルを移動させる
+					trans.pos = movedPos_;
+					trans.Update();
 
-					int pHit = HitCheck_Capsule_Triangle(
-						cap.GetPosTop(), cap.GetPosDown(), cap.GetRadius(),
-						hit.Position[0], hit.Position[1], hit.Position[2]);
-
-					if (pHit)
-					{
-						movedPos_ = VAdd(movedPos_, VScale(hit.Normal, 0.1f));
-						// カプセルを移動させる
-						trans.pos = movedPos_;
-						trans.Update();
-
-						continue;
-					}
-
-					break;
-
+					continue;
 				}
+
+				break;
 
 			}
 
-			// 検出した地面ポリゴン情報の後始末
-			MV1CollResultPolyDimTerminate(hits);
-
 		}
 
-		return;
-} 
+		// 検出した地面ポリゴン情報の後始末
+		MV1CollResultPolyDimTerminate(hits);
 
-void Player::CalcGravityPow(void)
+	}
+
+	return;
+}
+
+void Duckling::CalcGravityPow(void)
 {
 	// 重力方向
 	VECTOR dirGravity = AsoUtility::DIR_D;
@@ -594,35 +421,11 @@ void Player::CalcGravityPow(void)
 
 }
 
-bool Player::IsEndLanding(void)
+bool Duckling::IsEndLanding(void)
 {
-	bool ret = true;
-
-	// アニメーションがジャンプではない
-	if (animationController_->GetPlayType() != (int)ANIM_TYPE::JUMP)
-	{
-		return ret;
-	}
-
-	// アニメーションが終了しているか
-	if (animationController_->IsEnd())
-	{
-		return ret;
-	}
 
 	return false;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 

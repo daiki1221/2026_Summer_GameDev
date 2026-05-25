@@ -40,10 +40,12 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::PLAYER_SHADOW, res);
 
 		// ÉÅÉCÉìòfêØ
-	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage.mv1");
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage2.mv1");
 	resourcesMap_.emplace(SRC::MAIN_PLANET, res);
 
-
+	// Ç–Ç»
+	res = new RES(RES_T::MODEL, PATH_MDL + "Player/duckling.mv1");
+	resourcesMap_.emplace(SRC::DUCKLING, res);
 
 
 }

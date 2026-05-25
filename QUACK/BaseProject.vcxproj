@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Actor\Duckling.cpp" />
     <ClCompile Include="Src\Object\Actor\Planet.cpp" />
     <ClCompile Include="Src\Object\Common\Collider.cpp" />
     <ClCompile Include="Src\Object\Common\Capsule.cpp" />
@@ -45,6 +46,7 @@
     <ClCompile Include="Src\Object\Common\Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Actor\Duckling.h" />
     <ClInclude Include="Src\Object\Actor\Planet.h" />
     <ClInclude Include="Src\Object\Common\Collider.h" />
     <ClInclude Include="Src\Object\Common\Capsule.h" />

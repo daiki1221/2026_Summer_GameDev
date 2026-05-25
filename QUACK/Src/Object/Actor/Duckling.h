@@ -1,58 +1,21 @@
 #pragma once
 #include <DxLib.h>
+#include <vector>
 #include "ActorBase.h"
 class AnimationController;
 class Collider;
 class Capsule;
 
-class Player : public ActorBase
+class Duckling : public ActorBase
 {
+	public:
 
-public:
+		// 回転完了までの時間
+		static constexpr float TIME_ROT = 1.0f;
 
-	// スピード
-	static constexpr float SPEED_MOVE = 5.0f;
-	static constexpr float SPEED_RUN = 10.0f;
+	Duckling(void);
 
-	// 回転完了までの時間
-	static constexpr float TIME_ROT = 1.0f;
-
-	// ジャンプ力
-	static constexpr float POW_JUMP = 35.0f;
-
-	// ジャンプ受付時間
-	static constexpr float TIME_JUMP_IN = 0.5f;
-
-	// アニメーションの再生速度
-	static constexpr float SPEED_ANIM = 20.0f;
-
-	// 状態
-	enum class STATE
-	{
-		NONE,
-		PLAY,
-		WARP_RESERVE,
-		WARP_MOVE,
-		DEAD,
-		VICTORY,
-		END
-	};
-
-	// アニメーション種別
-	enum class ANIM_TYPE
-	{
-		IDLE,
-		WALK,
-		RUN,
-		FAST_RUN,
-		JUMP,
-		MAX,
-	};
-
-	// コンストラクタ
-	Player(void);
-	// デストラクタ
-	~Player(void);
+	~Duckling(void);
 
 	void Init(void) override;
 	void Update(void) override;
@@ -73,12 +36,6 @@ public:
 	const Transform* GetTransform() const;
 
 private:
-	// アニメーション制御
-	std::unique_ptr<AnimationController> animationController_;
-
-	// 状態管理
-	STATE state_;
-
 	// 移動スピード
 	float speed_;
 
@@ -118,11 +75,6 @@ private:
 
 	void InitAnimation(void);
 
-	// 状態遷移
-	void ChangeState(STATE state);
-	void ChangeStateNone(void);
-	void ChangeStatePlay(void);
-
 	// 更新ステップ
 	void UpdateNone(void);
 	void UpdatePlay(void);
@@ -149,4 +101,6 @@ private:
 	// 着地モーション終了
 	bool IsEndLanding(void);
 
+
 };
+
