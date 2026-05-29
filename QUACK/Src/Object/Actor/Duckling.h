@@ -5,13 +5,34 @@
 class AnimationController;
 class Collider;
 class Capsule;
+class Player;
 
 class Duckling : public ActorBase
 {
 	public:
 
+
 		// 回転完了までの時間
 		static constexpr float TIME_ROT = 1.0f;
+
+		// ジャンプ力
+		static constexpr float POW_JUMP = 35.0f;
+
+		// ジャンプ受付時間
+		static constexpr float TIME_JUMP_IN = 0.5f;
+
+		enum class ANIM_TYPE
+		{
+			IDLE,
+			WALK,
+			RUN,
+			FAST_RUN,
+			JUMP,
+			MAX,
+		};
+
+
+
 
 	Duckling(void);
 
@@ -35,7 +56,12 @@ class Duckling : public ActorBase
 	// Transform の取得
 	const Transform* GetTransform() const;
 
+	void SetPlayer(Player* player);
+
 private:
+	// アニメーション制御
+	std::unique_ptr<AnimationController> animationController_;
+
 	// 移動スピード
 	float speed_;
 
@@ -65,6 +91,7 @@ private:
 	// 衝突判定に用いられるコライダ
 	std::vector<Collider*> colliders_;
 	std::unique_ptr<Capsule> capsule_;
+	Player* player_;
 
 	// 衝突チェック
 	VECTOR gravHitPosDown_;

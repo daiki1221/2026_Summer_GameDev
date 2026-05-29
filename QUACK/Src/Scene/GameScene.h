@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include "SceneBase.h"
+#include "ResultScene.h"
 class Stage;
 class Player;
 class Duckling;
@@ -25,7 +26,7 @@ public:
 	// •`‰æ
 	void Draw(void) override;
 
-
+	
 
 private:
 
@@ -34,5 +35,9 @@ private:
 
 	std::shared_ptr<Player> player_;
 
-	std::unique_ptr<Duckling> duckling_;
+	std::shared_ptr<Duckling> duckling_;
+
+	float time_; //Žc‚èŽžŠÔ
+
+	
 };

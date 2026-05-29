@@ -5,6 +5,7 @@
 #include "../Common/Fader.h"
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
+#include "../Scene/ResultScene.h"
 #include "Camera.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
@@ -189,6 +190,22 @@ Camera* SceneManager::GetCamera(void) const
 	return camera_.get();
 }
 
+void SceneManager::OnReachNest(void)
+{
+	resultType_ = ResultScene::RESULT_TYPE::CLEAR;
+	ChangeScene(SCENE_ID::RESULT);
+}
+
+void SceneManager::SetResult(ResultScene::RESULT_TYPE type)
+{
+	resultType_ = type;
+}
+
+ResultScene::RESULT_TYPE SceneManager::GetResult(void)
+{
+	return resultType_;
+}
+
 SceneManager::SceneManager(void)
 {
 
@@ -236,6 +253,9 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 	case SCENE_ID::GAME:
 		scene_ = std::make_unique<GameScene>();
 		break;
+	case SCENE_ID::RESULT:
+		scene_ = std::make_unique<ResultScene>();
+		break;
 	}
 
 	// äeÉVÅ[ÉìÇÃèâä˙âª
@@ -275,5 +295,9 @@ void SceneManager::Fade(void)
 	}
 
 }
+
+
+
+
 
 

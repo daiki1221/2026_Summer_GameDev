@@ -8,12 +8,15 @@
 #include "../../Object/Actor/Planet.h"
 #include "../../Object/Common/Collider.h"
 #include "../../Object/Common/Transform.h"
+#include "../../Object/Actor/Duckling.h"
 #include "Stage.h"
 
-Stage::Stage(std::weak_ptr<Player> player)
+Stage::Stage(std::weak_ptr<Player> player
+              , std::weak_ptr<Duckling> duckling)
 	: resMng_(ResourceManager::GetInstance())
 {
 	player_ = player;
+	duckling_ = duckling;
 	activeName_ = NAME::MAIN_PLANET;
 	step_ = 0.0f;
 }
@@ -35,6 +38,16 @@ void Stage::Init(void)
 	MakeMainStage();
 
 	step_ = -1.0f;
+
+	nestModelId_ = MV1LoadModel(
+		(Application::PATH_MODEL + "Stage/nest.mv1").c_str());
+	int materialNum2 = MV1GetMaterialNum(nestModelId_);
+	for (int i = 0; i < materialNum2; ++i)
+	{
+		MV1SetMaterialDifColor(nestModelId_, i, { 0.0f, 0.0f, 0.0f, 1.0f });
+	}
+
+	MV1SetPosition(nestModelId_, { -100.0f, -100.0f, 300.0f }); // 地面上に設置
 }
 
 void Stage::Update(void)
@@ -53,6 +66,7 @@ void Stage::Draw(void)
 	{
 		s.second->Draw();
 	}
+	MV1DrawModel(nestModelId_);
 }
 
 
@@ -67,6 +81,10 @@ void Stage::ChangeStage(NAME type)
 	// ステージの当たり判定をプレイヤーに設定
 	player_.lock()->ClearCollider();
 	player_.lock()->AddCollider(activePlanet_->GetTransform().collider_);
+
+	// ステージの当たり判定をヒナに設定
+	duckling_.lock()->ClearCollider();
+	duckling_.lock()->AddCollider(activePlanet_->GetTransform().collider_);
 
 	step_ = TIME_STAGE_CHANGE;
 

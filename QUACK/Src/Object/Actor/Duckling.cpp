@@ -38,6 +38,8 @@ Duckling::Duckling(void)
 	imgShadow_ = -1;
 
 	capsule_ = nullptr;
+
+
 }
 
 Duckling::~Duckling(void)
@@ -49,18 +51,33 @@ void Duckling::Init(void)
 	transform_.SetModel(resMng_.LoadModelDuplicate(
 		ResourceManager::SRC::DUCKLING));
 	transform_.scl = { 0.3f, 0.3f, 0.3f };
-	transform_.pos = { -50.0f, -120.0f, 1000.0f };
+	transform_.pos = { 0.0f, -30.0f, 1000.0f };
 	transform_.quaRot = Quaternion();
 	transform_.quaRotLocal =
 		Quaternion::Euler({ 0.0f, AsoUtility::Deg2RadF(180.0f), 0.0f });
 	transform_.Update();
 
+	InitAnimation();
+
+	// カプセルコライダ
+	capsule_ = std::make_unique<Capsule>(transform_);
+	capsule_->SetLocalPosTop({ 0.0f, 110.0f, 0.0f });
+	capsule_->SetLocalPosDown({ 0.0f, 30.0f, 0.0f });
+	capsule_->SetRadius(20.0f);
+
+	// 丸影画像
+	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
+
+
+
 }
 
 void Duckling::Update(void)
 {
+	UpdatePlay();
 	// モデル制御更新
 	transform_.Update();
+	
 }
 
 void Duckling::Draw(void)
@@ -90,12 +107,13 @@ const Capsule* Duckling::GetCapsule(void) const
 void Duckling::InitAnimation(void)
 {
 
-	/*std::string path = Application::PATH_MODEL + "Duckling/";
+	std::string path = Application::PATH_MODEL + "Duckling/";
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
 	animationController_->Add((int)ANIM_TYPE::IDLE, path + "Idle.mv1", 20.0f);
 	animationController_->Add((int)ANIM_TYPE::RUN, path + "Run.mv1", 20.0f);
 	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "FastRun.mv1", 20.0f);
 	animationController_->Add((int)ANIM_TYPE::JUMP, path + "Jump.mv1", 60.0f);
+	/*
 	animationController_->Add((int)ANIM_TYPE::WARP_PAUSE, path + "WarpPose.mv1", 60.0f);
 	animationController_->Add((int)ANIM_TYPE::FLY, path + "Flying.mv1", 60.0f);
 	animationController_->Add((int)ANIM_TYPE::FALLING, path + "Falling.mv1", 80.0f);
@@ -113,6 +131,7 @@ void Duckling::UpdatePlay(void)
 {
 
 	// 移動処理
+	
 	ProcessMove();
 
 	// ジャンプ処理
@@ -238,22 +257,120 @@ const Transform* Duckling::GetTransform() const
 	return &transform_;
 }
 
+void Duckling::SetPlayer(Player* player)
+{
+	player_ = player;
+}
+
 void Duckling::ProcessMove(void)
 {
+	if (player_ == nullptr)
+	{
+		return;
+	}
 
+	// プレイヤーとの距離
+	VECTOR toPlayer =
+		VSub(player_->GetPos(), transform_.pos);
 
+	float playerDist = VSize(toPlayer);
+
+	// この距離以内で追従
+	float activeDist = 300.0f;
+
+	// 離れていたら何もしない
+	if (playerDist > activeDist)
+	{
+		movePow_ = AsoUtility::VECTOR_ZERO;
+		return;
+	}
+
+	// プレイヤー後方距離
+	float backDist = 120.0f;
+
+	// プレイヤー前方向
+	VECTOR forward = player_->GetForward();
+
+	// 後ろの目標地点
+	VECTOR targetPos =
+		VSub(player_->GetPos(),
+			VScale(forward, backDist));
+
+	// 高さ無視
+	targetPos.y = transform_.pos.y;
+
+	// Duckling → 目標地点
+	VECTOR toTarget =
+		VSub(targetPos, transform_.pos);
+
+	float dist = VSize(toTarget);
+
+	// 止まる距離
+	float stopDist = 2.0f;
+
+	if (dist > stopDist)
+	{
+		VECTOR dir = VNorm(toTarget);
+
+		speed_ = 3.0f;
+
+		movePow_ = VScale(dir, speed_);
+
+		double rotY = atan2(dir.x, dir.z);
+
+		SetGoalRotate(rotY);
+	}
+	else
+	{
+		movePow_ = AsoUtility::VECTOR_ZERO;
+	}
 }
 
 void Duckling::ProcessJump(void)
 {
+	bool isHit = CheckHitKey(KEY_INPUT_O);
 
+	// ジャンプ
+	if (isHit && (isJump_ || IsEndLanding()))
+	{
+
+		if (!isJump_)
+		{
+			// 制御無しジャンプ
+			//mAnimationController->Play((int)ANIM_TYPE::JUMP);
+			// ループしないジャンプ
+			//mAnimationController->Play((int)ANIM_TYPE::JUMP, false);
+			// 切り取りアニメーション
+			//mAnimationController->Play((int)ANIM_TYPE::JUMP, false, 13.0f, 24.0f);
+			// 無理やりアニメーション
+			animationController_->Play((int)ANIM_TYPE::JUMP, true, 13.0f, 25.0f);
+			animationController_->SetEndLoop(23.0f, 25.0f, 5.0f);
+		}
+
+		isJump_ = true;
+
+		// ジャンプの入力受付時間をヘラス
+		stepJump_ += scnMng_.GetDeltaTime();
+		if (stepJump_ < TIME_JUMP_IN)
+		{
+			jumpPow_ = VScale(AsoUtility::DIR_U, POW_JUMP);
+		}
+
+	}
+
+	// ボタンを離したらジャンプ力に加算しない
+	if (!isHit)
+	{
+		stepJump_ = TIME_JUMP_IN;
+	}
 
 }
 
+
 void Duckling::SetGoalRotate(double rotRad)
 {
-	VECTOR cameraRot = SceneManager::GetInstance().GetCamera()->GetAngles();
-	Quaternion axis = Quaternion::AngleAxis((double)cameraRot.y + rotRad, AsoUtility::AXIS_Y);
+	//VECTOR cameraRot = SceneManager::GetInstance().GetCamera()->GetAngles();
+	Quaternion axis = Quaternion::AngleAxis((double)rotRad, AsoUtility::AXIS_Y);
 
 	// 現在設定されている回転との角度差を取る
 	double angleDiff = Quaternion::Angle(axis, goalQuaRot_);
@@ -290,6 +407,7 @@ void Duckling::Collision(void)
 	// 移動
 	transform_.pos = movedPos_;
 }
+
 
 void Duckling::CollisionGravity(void)
 {
@@ -328,7 +446,15 @@ void Duckling::CollisionGravity(void)
 			jumpPow_ = AsoUtility::VECTOR_ZERO;
 			stepJump_ = 0.0f;
 
-			
+			if (isJump_)
+			{
+				// 着地モーション
+				animationController_->Play(
+					(int)ANIM_TYPE::JUMP, false, 29.0f, 45.0f, false, true);
+			}
+
+			isJump_ = false;
+
 		}
 
 	}
@@ -423,9 +549,23 @@ void Duckling::CalcGravityPow(void)
 
 bool Duckling::IsEndLanding(void)
 {
+	bool ret = true;
+
+	// アニメーションがジャンプではない
+	if (animationController_->GetPlayType() != (int)ANIM_TYPE::JUMP)
+	{
+		return ret;
+	}
+
+	// アニメーションが終了しているか
+	if (animationController_->IsEnd())
+	{
+		return ret;
+	}
 
 	return false;
 }
+
 
 
 

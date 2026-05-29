@@ -613,7 +613,10 @@ bool Player::IsEndLanding(void)
 	return false;
 }
 
-
+VECTOR Player::GetForward(void) const
+{
+	return transform_.quaRot.GetForward();
+}
 
 
 

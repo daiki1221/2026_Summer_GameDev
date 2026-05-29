@@ -2,6 +2,7 @@
 #include <memory>
 #include <chrono>
 #include <DxLib.h>
+#include "../Scene/ResultScene.h"
 class SceneBase;
 class Fader;
 class Camera;
@@ -24,7 +25,8 @@ public:
 	{
 		NONE,
 		TITLE,
-		GAME
+		GAME,
+		RESULT,
 	};
 	
 	// インスタンスの生成
@@ -60,6 +62,12 @@ public:
 	// カメラの取得
 	Camera* GetCamera(void) const;
 
+	// 巣に到達したときの処理
+	void OnReachNest(void);
+
+	void SetResult(ResultScene::RESULT_TYPE type);	// リザルトタイプの設定
+	ResultScene::RESULT_TYPE GetResult(void);		// リザルトタイプの取得
+
 private:
 
 	// 静的インスタンス
@@ -67,6 +75,8 @@ private:
 
 	SCENE_ID sceneId_;
 	SCENE_ID waitSceneId_;
+
+	ResultScene::RESULT_TYPE resultType_;
 
 	// 各種シーン
 	std::unique_ptr<SceneBase> scene_;

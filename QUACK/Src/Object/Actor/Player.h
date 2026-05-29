@@ -11,7 +11,7 @@ class Player : public ActorBase
 public:
 
 	// スピード
-	static constexpr float SPEED_MOVE = 5.0f;
+	static constexpr float SPEED_MOVE = 3.0f;
 	static constexpr float SPEED_RUN = 10.0f;
 
 	// 回転完了までの時間
@@ -71,6 +71,8 @@ public:
 
 	// Transform の取得
 	const Transform* GetTransform() const;
+
+	VECTOR GetForward(void) const;
 
 private:
 	// アニメーション制御

@@ -2,10 +2,12 @@
 #include <map>
 #include<memory>
 #include "../Common/Transform.h"
+#include "../../Application.h"
 class ResourceManager;
 class WarpStar;
 class Planet;
 class Player;
+class Duckling;
 
 class Stage
 {
@@ -33,7 +35,7 @@ public:
 	};
 
 	// コンストラクタ
-	Stage(std::weak_ptr<Player> player);
+	Stage(std::weak_ptr<Player> player, std::weak_ptr<Duckling> duckling);
 
 	// デストラクタ
 	~Stage(void);
@@ -54,6 +56,7 @@ private:
 	ResourceManager& resMng_;
 
 	std::weak_ptr<Player> player_;
+	std::weak_ptr<Duckling> duckling_;
 
 	// ステージアクティブになっている惑星の情報
 	NAME activeName_;
@@ -70,5 +73,6 @@ private:
 
 	// 最初の惑星
 	void MakeMainStage(void);
+	int nestModelId_;
 
 };
