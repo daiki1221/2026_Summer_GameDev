@@ -47,6 +47,14 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::MODEL, PATH_MDL + "Player/duckling.mv1");
 	resourcesMap_.emplace(SRC::DUCKLING, res);
 
+	// ëÉ
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/nest.mv1");
+	resourcesMap_.emplace(SRC::NEST, res);
+
+	// ãÛÉhÅ[ÉÄ
+	res = new RES(RES_T::MODEL, PATH_MDL + "SkyDome/SkyDome.mv1");
+	resourcesMap_.emplace(SRC::SKY_DOME, res);
+
 
 }
 

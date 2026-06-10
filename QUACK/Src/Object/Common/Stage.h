@@ -76,6 +76,7 @@ private:
 
 	VECTOR pos1_;
 	VECTOR scl_;
+	VECTOR scl;
 
 	static constexpr float SCALE = 100.0f;
 	static constexpr VECTOR SCALES = { SCALE,SCALE,SCALE };
@@ -84,4 +85,6 @@ private:
 	void MakeMainStage(void);
 	int nestModelId_;
 
+	Transform nestTrans_;
+	Transform skyTrans_;
 };

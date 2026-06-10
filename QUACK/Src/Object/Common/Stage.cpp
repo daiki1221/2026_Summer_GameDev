@@ -41,25 +41,29 @@ void Stage::Init(void)
 	MakeMainStage();
 
 	step_ = -1.0f;
+	
+	nestTrans_.SetModel(resMng_.LoadModelDuplicate(
+		ResourceManager::SRC::NEST));
 
-	nestModelId_ = MV1LoadModel(
-		(Application::PATH_MODEL + "Stage/nest.mv1").c_str());
-	int materialNum2 = MV1GetMaterialNum(nestModelId_);
+	nestTrans_.scl = { 0.05f, 0.05f, 0.05f };
+	MV1SetScale(nestTrans_.modelId, nestTrans_.scl);
+
+	int materialNum2 = MV1GetMaterialNum(nestTrans_.modelId);
 	for (int i = 0; i < materialNum2; ++i)
 	{
-		MV1SetMaterialDifColor(nestModelId_, i, { 0.0f, 0.0f, 0.0f, 1.0f });
+		MV1SetMaterialDifColor(nestTrans_.modelId, i, { 0.0f, 0.0f, 0.0f, 1.0f });
 	}
 
-	MV1SetPosition(nestModelId_, { -100.0f, -100.0f, 300.0f }); // 地面上に設置
+	MV1SetPosition(nestTrans_.modelId, { -100.0f, -120.0f, 300.0f }); // 地面上に設置
 
-	skyModelId_ = MV1LoadModel(
-		(Application::PATH_MODEL + "SkyDome/SkyDome.mv1").c_str());
+	skyTrans_.SetModel(resMng_.LoadModelDuplicate(
+		ResourceManager::SRC::SKY_DOME));
 
 	scl_ = SCALES;
 	pos1_ = AsoUtility::VECTOR_ZERO;
 
-	MV1SetScale(skyModelId_, scl_);
-	MV1SetPosition(skyModelId_, pos1_);
+	MV1SetScale(skyTrans_.modelId, scl_);
+	MV1SetPosition(skyTrans_.modelId, pos1_);
 
 }
 
@@ -71,7 +75,7 @@ void Stage::Update(void)
 		s.second->Update();
 	}
 
-	MV1DrawModel(skyModelId_);
+	MV1DrawModel(skyTrans_.modelId);
 }
 
 void Stage::Draw(void)
@@ -81,8 +85,8 @@ void Stage::Draw(void)
 	{
 		s.second->Draw();
 	}
-	MV1DrawModel(nestModelId_);
-	MV1DrawModel(skyModelId_);
+	MV1DrawModel(nestTrans_.modelId);
+	MV1DrawModel(skyTrans_.modelId);
 }
 
 

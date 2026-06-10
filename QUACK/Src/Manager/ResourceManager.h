@@ -15,7 +15,8 @@ public:
 		PLAYER_SHADOW,
 		MAIN_PLANET,
 		DUCKLING,
-
+		NEST,
+		SKY_DOME,
 	};
 
 	// 明示的にインステンスを生成する

@@ -205,6 +205,45 @@ void Camera::ProcessRot(void)
 		}
 	}
 
+	int mouseX, mouseY;
+	GetMousePoint(&mouseX, &mouseY);
+
+	int screenW, screenH;
+	GetScreenState(&screenW, &screenH, NULL);
+	int centerX = screenW / 2;
+	int centerY = screenH / 2;
+
+	static bool first = true;
+	static int prevMouseX = centerX;
+	static int prevMouseY = centerY;
+
+	if (first) {
+		SetMousePoint(centerX, centerY);
+		first = false;
+	}
+
+	int deltaX = mouseX - prevMouseX;
+	int deltaY = mouseY - prevMouseY;
+
+	prevMouseX = mouseX;
+	prevMouseY = mouseY;
+
+	// --- マウス感度調整 ---
+	float mouseSensitivity = 0.005f;
+	angles_.y += deltaX * mouseSensitivity;
+	angles_.x += deltaY * mouseSensitivity;
+
+	// 上下の回転を制限
+	if (angles_.x > DX_PI_F / 5.0f) angles_.x = DX_PI_F / 5.0f;
+	if (angles_.x < -DX_PI_F / 5.0f) angles_.x = -DX_PI_F / 5.0f;
+
+
+	// --- マウスを常に中央に戻す ---
+	/*SetMousePoint(centerX, centerY);
+	prevMouseX = centerX;
+	prevMouseY = centerY;*/
+
+
 }
 
 void Camera::SetBeforeDrawFixedPoint(void)
