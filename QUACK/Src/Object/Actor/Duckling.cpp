@@ -37,6 +37,8 @@ Duckling::Duckling(void)
 
 	imgShadow_ = -1;
 
+	followIndex_ = 0;
+
 	capsule_ = nullptr;
 
 
@@ -67,8 +69,6 @@ void Duckling::Init(void)
 
 	// 丸影画像
 	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
-
-
 
 }
 
@@ -252,6 +252,11 @@ const VECTOR& Duckling::GetPos(void) const
 	return transform_.pos;
 }
 
+void Duckling::SetPos(const VECTOR& pos)
+{
+	transform_.pos = pos;
+}
+
 const Transform* Duckling::GetTransform() const
 {
 	return &transform_;
@@ -260,6 +265,11 @@ const Transform* Duckling::GetTransform() const
 void Duckling::SetPlayer(Player* player)
 {
 	player_ = player;
+}
+
+void Duckling::SetFollowIndex(int index)
+{
+	followIndex_ = index;
 }
 
 void Duckling::ProcessMove(void)
@@ -287,6 +297,12 @@ void Duckling::ProcessMove(void)
 
 	// プレイヤー後方距離
 	float backDist = 120.0f;
+
+	// ひな同士の間隔
+	float spacing = 80.0f;
+
+	// 先頭から順に後ろへ並ぶ
+	backDist += spacing * (followIndex_ + 1);
 
 	// プレイヤー前方向
 	VECTOR forward = player_->GetForward();

@@ -31,9 +31,6 @@ class Duckling : public ActorBase
 			MAX,
 		};
 
-
-
-
 	Duckling(void);
 
 	~Duckling(void);
@@ -53,10 +50,14 @@ class Duckling : public ActorBase
 	// 座標の取得
 	const VECTOR& GetPos(void) const;
 
+	void SetPos(const VECTOR& pos);
+
 	// Transform の取得
 	const Transform* GetTransform() const;
 
 	void SetPlayer(Player* player);
+
+	void SetFollowIndex(int index);
 
 private:
 	// アニメーション制御
@@ -99,6 +100,8 @@ private:
 
 	// 丸影
 	int imgShadow_;
+
+	int followIndex_;
 
 	void InitAnimation(void);
 

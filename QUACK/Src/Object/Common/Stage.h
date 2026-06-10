@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include<memory>
+#include <vector>
 #include "../Common/Transform.h"
 #include "../../Application.h"
 class ResourceManager;
@@ -35,7 +36,7 @@ public:
 	};
 
 	// コンストラクタ
-	Stage(std::weak_ptr<Player> player, std::weak_ptr<Duckling> duckling);
+	Stage(std::weak_ptr<Player> player, const std::vector<std::shared_ptr<Duckling>>& duckling);
 
 	// デストラクタ
 	~Stage(void);
@@ -56,7 +57,7 @@ private:
 	ResourceManager& resMng_;
 
 	std::weak_ptr<Player> player_;
-	std::weak_ptr<Duckling> duckling_;
+	std::vector<std::weak_ptr<Duckling>> duckling_;
 
 	// ステージアクティブになっている惑星の情報
 	NAME activeName_;
@@ -70,6 +71,14 @@ private:
 	Planet* nullPlanet = nullptr;
 
 	float step_;
+
+	int skyModelId_;
+
+	VECTOR pos1_;
+	VECTOR scl_;
+
+	static constexpr float SCALE = 100.0f;
+	static constexpr VECTOR SCALES = { SCALE,SCALE,SCALE };
 
 	// 最初の惑星
 	void MakeMainStage(void);

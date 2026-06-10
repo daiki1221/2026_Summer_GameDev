@@ -12,11 +12,14 @@
 #include "Stage.h"
 
 Stage::Stage(std::weak_ptr<Player> player
-              , std::weak_ptr<Duckling> duckling)
+              , const std::vector<std::shared_ptr<Duckling>>& duckling)
 	: resMng_(ResourceManager::GetInstance())
 {
 	player_ = player;
-	duckling_ = duckling;
+	for (auto& duck : duckling)
+	{
+		duckling_.push_back(duck);
+	}
 	activeName_ = NAME::MAIN_PLANET;
 	step_ = 0.0f;
 }
@@ -48,6 +51,16 @@ void Stage::Init(void)
 	}
 
 	MV1SetPosition(nestModelId_, { -100.0f, -100.0f, 300.0f }); // 地面上に設置
+
+	skyModelId_ = MV1LoadModel(
+		(Application::PATH_MODEL + "SkyDome/SkyDome.mv1").c_str());
+
+	scl_ = SCALES;
+	pos1_ = AsoUtility::VECTOR_ZERO;
+
+	MV1SetScale(skyModelId_, scl_);
+	MV1SetPosition(skyModelId_, pos1_);
+
 }
 
 void Stage::Update(void)
@@ -57,6 +70,8 @@ void Stage::Update(void)
 	{
 		s.second->Update();
 	}
+
+	MV1DrawModel(skyModelId_);
 }
 
 void Stage::Draw(void)
@@ -67,6 +82,7 @@ void Stage::Draw(void)
 		s.second->Draw();
 	}
 	MV1DrawModel(nestModelId_);
+	MV1DrawModel(skyModelId_);
 }
 
 
@@ -83,8 +99,11 @@ void Stage::ChangeStage(NAME type)
 	player_.lock()->AddCollider(activePlanet_->GetTransform().collider_);
 
 	// ステージの当たり判定をヒナに設定
-	duckling_.lock()->ClearCollider();
-	duckling_.lock()->AddCollider(activePlanet_->GetTransform().collider_);
+	for (auto& duck : duckling_)
+	{
+		duck.lock()->ClearCollider();
+		duck.lock()->AddCollider(activePlanet_->GetTransform().collider_);
+	}
 
 	step_ = TIME_STAGE_CHANGE;
 

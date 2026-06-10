@@ -26,10 +26,22 @@ void GameScene::Init(void)
 	player_ = std::make_shared<Player>();
 	player_->Init();
 
-	duckling_ = std::make_shared<Duckling>();
-	duckling_->Init();
+	for (int i = 0; i < 3; i++)
+	{
+		auto duck = std::make_shared<Duckling>();
 
-	duckling_->SetPlayer(player_.get());
+		duck->Init();
+
+		duck->SetPos({
+			i * 50.0f,
+			-30.0f,
+			1000.0f
+			});
+
+		duck->SetPlayer(player_.get());
+
+		duckling_.push_back(duck);
+	}
 
 	// ステージの生成と初期化
 	stage_ = std::make_unique<Stage>(player_, duckling_);
@@ -67,19 +79,29 @@ void GameScene::Update(void)
 
 	player_->Update();
 
-	duckling_->Update();
+	for (auto& duck : duckling_)
+	{
+		duck->Update();
+	}
 
 	VECTOR nestPos = { -100.0f, -100.0f, 300.0f };
 	const float NEST_RADIUS = 50.0f;           // 判定用半径
+	int reachCount = 0;
 
-	if (duckling_) {
-		float dist = VSize(VSub(duckling_->GetPos(), nestPos));
-		if (dist < NEST_RADIUS) {
-			// ひなが巣に到達！
-			SceneManager::GetInstance().OnReachNest(); // → クリア処理へ
+	for (auto& duck : duckling_)
+	{
+		float dist = VSize(VSub(duck->GetPos(), nestPos));
+
+		if (dist < NEST_RADIUS)
+		{
+			reachCount++;
 		}
 	}
 
+	if (reachCount >= 3)
+	{
+		SceneManager::GetInstance().OnReachNest();
+	}
 
 	
 }
@@ -91,7 +113,10 @@ void GameScene::Draw(void)
 
 	player_->Draw();
 
-	duckling_->Draw();
+	for (auto& duck : duckling_)
+	{
+		duck->Draw();
+	}
 
 	// 残り時間を描画
 	int timeDisplay = static_cast<int>(time_);

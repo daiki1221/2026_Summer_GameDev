@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "SceneBase.h"
 #include "ResultScene.h"
 class Stage;
@@ -35,7 +36,7 @@ private:
 
 	std::shared_ptr<Player> player_;
 
-	std::shared_ptr<Duckling> duckling_;
+	std::vector<std::shared_ptr<Duckling>> duckling_;
 
 	float time_; //c‚èŠÔ
 
