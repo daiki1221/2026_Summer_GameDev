@@ -55,6 +55,10 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::MODEL, PATH_MDL + "SkyDome/SkyDome.mv1");
 	resourcesMap_.emplace(SRC::SKY_DOME, res);
 
+	// “G
+	res = new RES(RES_T::MODEL, PATH_MDL + "Enemy/enemy.mv1");
+	resourcesMap_.emplace(SRC::ENEMY, res);
+
 
 }
 

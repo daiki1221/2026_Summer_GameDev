@@ -9,6 +9,7 @@
 #include "../Object/Actor/Player.h"
 #include "../Object/Actor/Planet.h"
 #include "../Object/Actor/Duckling.h"
+#include "../Object/Actor/Enemy.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -26,11 +27,16 @@ void GameScene::Init(void)
 	player_ = std::make_shared<Player>();
 	player_->Init();
 
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Init();
+
 	for (int i = 0; i < 3; i++)
 	{
 		auto duck = std::make_shared<Duckling>();
 
 		duck->Init();
+
+		duck->SetFollowIndex(i);
 
 		duck->SetPos({
 			i * 50.0f,
@@ -42,6 +48,17 @@ void GameScene::Init(void)
 
 		duckling_.push_back(duck);
 	}
+	// 追従設定
+	duckling_[0]->SetPlayer(player_.get());
+
+	for (int i = 1; i < duckling_.size(); i++)
+	{
+		duckling_[i]->SetPlayer(player_.get());
+
+		duckling_[i]->SetPrevDuckling(
+			duckling_[i - 1].get());
+	}
+
 
 	// ステージの生成と初期化
 	stage_ = std::make_unique<Stage>(player_, duckling_);
@@ -54,7 +71,7 @@ void GameScene::Init(void)
 	SceneManager::GetInstance().GetCamera()->SetFollow(player_->GetTransform());
 	SceneManager::GetInstance().GetCamera()->ChangeMode(Camera::MODE::FOLLOW);
 
-	time_ = 30.0f;
+	time_ = 300.0f;
 
 }
 
@@ -78,6 +95,8 @@ void GameScene::Update(void)
 	stage_->Update();
 
 	player_->Update();
+
+	enemy_->Update();
 
 	for (auto& duck : duckling_)
 	{
@@ -112,6 +131,8 @@ void GameScene::Draw(void)
 	stage_->Draw();
 
 	player_->Draw();
+
+	enemy_->Draw();
 
 	for (auto& duck : duckling_)
 	{

@@ -17,6 +17,7 @@ public:
 		DUCKLING,
 		NEST,
 		SKY_DOME,
+		ENEMY,
 	};
 
 	// 明示的にインステンスを生成する

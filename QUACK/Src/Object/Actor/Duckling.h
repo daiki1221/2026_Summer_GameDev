@@ -59,6 +59,10 @@ class Duckling : public ActorBase
 
 	void SetFollowIndex(int index);
 
+	void SetPrevDuckling(Duckling* duckling);
+
+	VECTOR GetForward(void) const;
+
 private:
 	// アニメーション制御
 	std::unique_ptr<AnimationController> animationController_;
@@ -131,6 +135,8 @@ private:
 	// 着地モーション終了
 	bool IsEndLanding(void);
 
+	Duckling* prevDuckling_ = nullptr;
+	
 
 };
 

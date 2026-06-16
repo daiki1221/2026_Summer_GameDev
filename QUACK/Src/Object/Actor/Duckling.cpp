@@ -70,6 +70,7 @@ void Duckling::Init(void)
 	// 丸影画像
 	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
 
+	
 }
 
 void Duckling::Update(void)
@@ -286,7 +287,7 @@ void Duckling::ProcessMove(void)
 	float playerDist = VSize(toPlayer);
 
 	// この距離以内で追従
-	float activeDist = 300.0f;
+	float activeDist = 400.0f;
 
 	// 離れていたら何もしない
 	if (playerDist > activeDist)
@@ -295,22 +296,34 @@ void Duckling::ProcessMove(void)
 		return;
 	}
 
-	// プレイヤー後方距離
-	float backDist = 120.0f;
+	VECTOR targetPos;
 
-	// ひな同士の間隔
-	float spacing = 80.0f;
+	if (followIndex_ == 0)
+	{
+		float backDist = 120.0f;
 
-	// 先頭から順に後ろへ並ぶ
-	backDist += spacing * (followIndex_ + 1);
+		VECTOR forward = player_->GetForward();
 
-	// プレイヤー前方向
-	VECTOR forward = player_->GetForward();
+		targetPos =
+			VSub(player_->GetPos(),
+				VScale(forward, backDist));
+	}
+	else
+	{
+		if (prevDuckling_ == nullptr)
+		{
+			return;
+		}
 
-	// 後ろの目標地点
-	VECTOR targetPos =
-		VSub(player_->GetPos(),
-			VScale(forward, backDist));
+		float spacing = 80.0f;
+
+		VECTOR dir =
+			prevDuckling_->GetForward();
+
+		targetPos =
+			VSub(prevDuckling_->GetPos(),
+				VScale(dir, spacing));
+	}
 
 	// 高さ無視
 	targetPos.y = transform_.pos.y;
@@ -582,6 +595,15 @@ bool Duckling::IsEndLanding(void)
 	return false;
 }
 
+void Duckling::SetPrevDuckling(Duckling* duck)
+{
+	prevDuckling_ = duck;
+}
+
+VECTOR Duckling::GetForward(void) const
+{
+	return transform_.GetForward();
+}
 
 
 

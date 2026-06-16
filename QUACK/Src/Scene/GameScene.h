@@ -6,6 +6,7 @@
 class Stage;
 class Player;
 class Duckling;
+class Enemy;
 
 class GameScene : public SceneBase
 {
@@ -37,6 +38,8 @@ private:
 	std::shared_ptr<Player> player_;
 
 	std::vector<std::shared_ptr<Duckling>> duckling_;
+
+	std::unique_ptr<Enemy> enemy_;
 
 	float time_; //c‚èŠÔ
 
