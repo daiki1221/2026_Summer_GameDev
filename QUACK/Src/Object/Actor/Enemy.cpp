@@ -268,47 +268,6 @@ void Enemy::ProcessMove(void)
 	}
 }
 
-void Enemy::ProcessJump(void)
-{
-	bool isHit = CheckHitKey(KEY_INPUT_O);
-
-	// ジャンプ
-	if (isHit && (isJump_ || IsEndLanding()))
-	{
-
-		if (!isJump_)
-		{
-			// 制御無しジャンプ
-			//mAnimationController->Play((int)ANIM_TYPE::JUMP);
-			// ループしないジャンプ
-			//mAnimationController->Play((int)ANIM_TYPE::JUMP, false);
-			// 切り取りアニメーション
-			//mAnimationController->Play((int)ANIM_TYPE::JUMP, false, 13.0f, 24.0f);
-			// 無理やりアニメーション
-			animationController_->Play((int)ANIM_TYPE::JUMP, true, 13.0f, 25.0f);
-			animationController_->SetEndLoop(23.0f, 25.0f, 5.0f);
-		}
-
-		isJump_ = true;
-
-		// ジャンプの入力受付時間をヘラス
-		stepJump_ += scnMng_.GetDeltaTime();
-		if (stepJump_ < TIME_JUMP_IN)
-		{
-			jumpPow_ = VScale(AsoUtility::DIR_U, POW_JUMP);
-		}
-
-	}
-
-	// ボタンを離したらジャンプ力に加算しない
-	if (!isHit)
-	{
-		stepJump_ = TIME_JUMP_IN;
-	}
-
-}
-
-
 void Enemy::SetGoalRotate(double rotRad)
 {
 	//VECTOR cameraRot = SceneManager::GetInstance().GetCamera()->GetAngles();
@@ -353,8 +312,6 @@ void Enemy::Collision(void)
 
 void Enemy::CollisionGravity(void)
 {
-	// ジャンプ量を加算
-	movedPos_ = VAdd(movedPos_, jumpPow_);
 
 	// 重力方向
 	VECTOR dirGravity = AsoUtility::DIR_D;
@@ -375,29 +332,6 @@ void Enemy::CollisionGravity(void)
 		// 地面との衝突
 		auto hit = MV1CollCheck_Line(
 			c->modelId_, -1, gravHitPosUp_, gravHitPosDown_);
-
-		// 最初は上の行のように実装して、木の上に登ってしまうことを確認する
-		//if (hit.HitFlag > 0)
-		if (hit.HitFlag > 0 && VDot(dirGravity, jumpPow_) > 0.9f)
-		{
-
-			// 衝突地点から、少し上に移動
-			movedPos_ = VAdd(hit.HitPosition, VScale(dirUpGravity, 2.0f));
-
-			// ジャンプリセット
-			jumpPow_ = AsoUtility::VECTOR_ZERO;
-			stepJump_ = 0.0f;
-
-			if (isJump_)
-			{
-				// 着地モーション
-				animationController_->Play(
-					(int)ANIM_TYPE::JUMP, false, 29.0f, 45.0f, false, true);
-			}
-
-			isJump_ = false;
-
-		}
 
 	}
 
@@ -476,28 +410,12 @@ void Enemy::CalcGravityPow(void)
 
 	// 重力
 	VECTOR gravity = VScale(dirGravity, gravityPow);
-	jumpPow_ = VAdd(jumpPow_, gravity);
-
-	// 最初は実装しない。地面と突き抜けることを確認する。
-	// 内積
-	float dot = VDot(dirGravity, jumpPow_);
-	if (dot >= 0.0f)
-	{
-		// 重力方向と反対方向(マイナス)でなければ、ジャンプ力を無くす
-		jumpPow_ = gravity;
-	}
 
 }
 
 bool Enemy::IsEndLanding(void)
 {
 	bool ret = true;
-
-	// アニメーションがジャンプではない
-	if (animationController_->GetPlayType() != (int)ANIM_TYPE::JUMP)
-	{
-		return ret;
-	}
 
 	// アニメーションが終了しているか
 	if (animationController_->IsEnd())

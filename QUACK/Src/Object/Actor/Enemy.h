@@ -89,15 +89,6 @@ private:
 	Quaternion goalQuaRot_;
 	float stepRotTime_;
 
-	// ジャンプ量
-	VECTOR jumpPow_;
-
-	// ジャンプ判定
-	bool isJump_;
-
-	// ジャンプの入力受付時間
-	float stepJump_;
-
 	// 衝突判定に用いられるコライダ
 	std::vector<Collider*> colliders_;
 	std::unique_ptr<Capsule> capsule_;
@@ -123,7 +114,6 @@ private:
 
 	// 操作
 	void ProcessMove(void);
-	void ProcessJump(void);
 
 	// 回転
 	void SetGoalRotate(double rotRad);

@@ -59,7 +59,6 @@ void Player::Init(void)
 	// アニメーションの設定
 	InitAnimation();
 
-
 	// カプセルコライダ
 	capsule_ = std::make_unique<Capsule>(transform_);
 	capsule_->SetLocalPosTop({ 0.0f, 110.0f, 0.0f });
@@ -90,7 +89,7 @@ void Player::Update(void)
 	transform_.Update();
 
 	// アニメーション再生
-	//animationController_->Update();
+	animationController_->Update();
 }
 
 void Player::Draw(void)

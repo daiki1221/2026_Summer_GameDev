@@ -59,6 +59,9 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::MODEL, PATH_MDL + "Enemy/enemy.mv1");
 	resourcesMap_.emplace(SRC::ENEMY, res);
 
+	//!
+	res = new RES(RES_T::IMG, PATH_IMG + "Exclamation.png");
+	resourcesMap_.emplace(SRC::ECXL, res);
 
 }
 

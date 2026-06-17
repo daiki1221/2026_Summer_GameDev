@@ -21,6 +21,8 @@ class Duckling : public ActorBase
 		// ƒWƒƒƒ“ƒvŽó•tŽžŠÔ
 		static constexpr float TIME_JUMP_IN = 0.5f;
 
+		static constexpr float FOUND_TIME = 1.0f;
+
 		enum class ANIM_TYPE
 		{
 			IDLE,
@@ -137,6 +139,12 @@ private:
 
 	Duckling* prevDuckling_ = nullptr;
 	
+	bool isFoundPlayer_;
+	bool isFollowing_ ;
+
+	float foundTimer_;
+
+	int imgExclamation_;
 
 };
 

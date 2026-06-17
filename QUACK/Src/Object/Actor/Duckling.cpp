@@ -41,6 +41,9 @@ Duckling::Duckling(void)
 
 	capsule_ = nullptr;
 
+	isFoundPlayer_ = false;
+	isFollowing_ = false;
+	foundTimer_ = 0.0f;
 
 }
 
@@ -70,11 +73,23 @@ void Duckling::Init(void)
 	// ŠÛ‰e‰æ‘œ
 	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
 
+	imgExclamation_ = resMng_.Load(ResourceManager::SRC::ECXL).handleId_;
 	
 }
 
 void Duckling::Update(void)
 {
+	if (isFoundPlayer_ && !isFollowing_)
+	{
+		foundTimer_ += scnMng_.GetDeltaTime();
+
+		if (foundTimer_ >= FOUND_TIME)
+		{
+			isFollowing_ = true;
+			foundTimer_ = 0.0f;
+		}
+	}
+
 	UpdatePlay();
 	// ƒ‚ƒfƒ‹§ŒäXV
 	transform_.Update();
@@ -88,6 +103,23 @@ void Duckling::Draw(void)
 
 	// ŠÛ‰e•`‰æ
 	DrawShadow();
+
+	if (isFoundPlayer_ && !isFollowing_)
+	{
+		VECTOR pos = transform_.pos;
+		pos.y += 120.0f;
+		
+		DrawBillboard3D(
+			pos,
+			0.5f,     
+			0.5f,      
+			50.0f,    
+			0.0f,     
+			imgExclamation_,
+			TRUE);
+
+	}
+	
 }
 
 void Duckling::AddCollider(Collider* collider)
@@ -289,8 +321,20 @@ void Duckling::ProcessMove(void)
 	// ‚±‚Ì‹——£ˆÈ“à‚Å’Ç]
 	float activeDist = 400.0f;
 
-	// —£‚ê‚Ä‚¢‚½‚ç‰½‚à‚µ‚È‚¢
-	if (playerDist > activeDist)
+	if (!isFoundPlayer_)
+	{
+		// —£‚ê‚Ä‚¢‚½‚ç‰½‚à‚µ‚È‚¢
+		if (playerDist <= activeDist)
+		{
+			isFoundPlayer_ = true;
+			foundTimer_ = 0.0f;
+		}
+
+		movePow_ = AsoUtility::VECTOR_ZERO;
+		return;
+	}
+
+	if(!isFollowing_)
 	{
 		movePow_ = AsoUtility::VECTOR_ZERO;
 		return;

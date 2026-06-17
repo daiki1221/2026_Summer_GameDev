@@ -18,6 +18,7 @@ public:
 		NEST,
 		SKY_DOME,
 		ENEMY,
+		ECXL,
 	};
 
 	// 明示的にインステンスを生成する
