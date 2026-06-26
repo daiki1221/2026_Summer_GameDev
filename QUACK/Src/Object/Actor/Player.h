@@ -1,9 +1,13 @@
 #pragma once
 #include <DxLib.h>
+#include <vector>
+#include <memory>
 #include "ActorBase.h"
 class AnimationController;
 class Collider;
 class Capsule;
+class Bullet;
+class Enemy;
 
 class Player : public ActorBase
 {
@@ -46,6 +50,7 @@ public:
 		RUN,
 		FAST_RUN,
 		JUMP,
+		ATTACK,
 		MAX,
 	};
 
@@ -74,9 +79,19 @@ public:
 
 	VECTOR GetForward(void) const;
 
+	void WaterBullet(const VECTOR& dir);
+
+	const std::vector<std::shared_ptr<Bullet>>& GetBullet() const;
+
+	void SetEnemy(Enemy* enemy);
+
 private:
 	// アニメーション制御
 	std::unique_ptr<AnimationController> animationController_;
+
+	std::vector<std::shared_ptr<Bullet>> bullet_;
+
+	Enemy* enemy_;
 
 	// 状態管理
 	STATE state_;
@@ -107,6 +122,9 @@ private:
 	// ジャンプの入力受付時間
 	float stepJump_;
 
+	VECTOR aimDir_;
+	bool isAiming_;
+
 	// 衝突判定に用いられるコライダ
 	std::vector<Collider*> colliders_;
 	std::unique_ptr<Capsule> capsule_;
@@ -117,6 +135,11 @@ private:
 
 	// 丸影
 	int imgShadow_;
+
+	bool isAttack_;
+	float attackTime_;
+
+	static constexpr float TIME_ATTACK = 0.5f;
 
 	void InitAnimation(void);
 
@@ -135,6 +158,7 @@ private:
 	// 操作
 	void ProcessMove(void);
 	void ProcessJump(void);
+	void ProcessAtttack(void);
 
 	// 回転
 	void SetGoalRotate(double rotRad);
@@ -150,5 +174,7 @@ private:
 
 	// 着地モーション終了
 	bool IsEndLanding(void);
+
+
 
 };

@@ -155,11 +155,12 @@ void Camera::SyncFollow(void)
 
 	// 注視点(通常重力でいうところのY値を追従対象と同じにする)
 	localPos = rotOutX_.PosAxis(LOCAL_F2T_POS);
-	targetPos_ = VAdd(pos, localPos);
+	targetPos_ = VAdd(pos, { 0.0f, 60.0f, 0.0f });
 
 	// カメラ位置
-	localPos = rot_.PosAxis(LOCAL_F2C_POS);
-	pos_ = VAdd(pos, localPos);
+	VECTOR back = rot_.GetBack();
+	pos_ = VAdd(pos, VScale(back, 200.0f));
+	pos_.y += 80.0f;
 
 	// カメラの上方向
 	cameraUp_ = AsoUtility::DIR_U;
@@ -234,14 +235,14 @@ void Camera::ProcessRot(void)
 	angles_.x += deltaY * mouseSensitivity;
 
 	// 上下の回転を制限
-	if (angles_.x > DX_PI_F / 5.0f) angles_.x = DX_PI_F / 5.0f;
-	if (angles_.x < -DX_PI_F / 5.0f) angles_.x = -DX_PI_F / 5.0f;
+	/*if (angles_.x > DX_PI_F / 5.0f) angles_.x = DX_PI_F / 5.0f;
+	if (angles_.x < -DX_PI_F / 5.0f) angles_.x = -DX_PI_F / 5.0f;*/
 
 
 	// --- マウスを常に中央に戻す ---
-	/*SetMousePoint(centerX, centerY);
+	SetMousePoint(centerX, centerY);
 	prevMouseX = centerX;
-	prevMouseY = centerY;*/
+	prevMouseY = centerY;
 
 
 }

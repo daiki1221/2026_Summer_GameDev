@@ -27,6 +27,11 @@ public:
 	// アニメーションの再生速度
 	static constexpr float SPEED_ANIM = 20.0f;
 
+	int hp_;
+	float hitColorTimer_;
+	bool isHit_;
+	int color;
+
 	// アニメーション種別
 	enum class ANIM_TYPE
 	{
@@ -62,6 +67,9 @@ public:
 
 	// Transform の取得
 	const Transform* GetTransform() const;
+
+	void Damage(int damage);
+	bool IsDead(void) const;
 
 
 private:
@@ -102,6 +110,8 @@ private:
 	int imgShadow_;
 
 	int followIndex_;
+
+	
 
 	void InitAnimation(void);
 

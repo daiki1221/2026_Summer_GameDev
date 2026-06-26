@@ -342,7 +342,10 @@ void Duckling::ProcessMove(void)
 
 	VECTOR targetPos;
 
-	if (followIndex_ == 0)
+	// 追従する位置を決める
+	if (followIndex_ == 0 ||
+		prevDuckling_ == nullptr ||
+		!prevDuckling_->IsFollowing())
 	{
 		float backDist = 120.0f;
 
@@ -354,11 +357,6 @@ void Duckling::ProcessMove(void)
 	}
 	else
 	{
-		if (prevDuckling_ == nullptr)
-		{
-			return;
-		}
-
 		float spacing = 80.0f;
 
 		VECTOR dir =
@@ -372,7 +370,7 @@ void Duckling::ProcessMove(void)
 	// 高さ無視
 	targetPos.y = transform_.pos.y;
 
-	// Duckling → 目標地点
+	// 目標地点
 	VECTOR toTarget =
 		VSub(targetPos, transform_.pos);
 
@@ -647,6 +645,11 @@ void Duckling::SetPrevDuckling(Duckling* duck)
 VECTOR Duckling::GetForward(void) const
 {
 	return transform_.GetForward();
+}
+
+bool Duckling::IsFollowing(void) const
+{
+	return isFollowing_;
 }
 
 

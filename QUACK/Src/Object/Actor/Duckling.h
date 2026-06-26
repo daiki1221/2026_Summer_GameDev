@@ -65,6 +65,8 @@ class Duckling : public ActorBase
 
 	VECTOR GetForward(void) const;
 
+	bool IsFollowing(void) const;
+
 private:
 	// アニメーション制御
 	std::unique_ptr<AnimationController> animationController_;

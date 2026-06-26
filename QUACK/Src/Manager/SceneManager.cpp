@@ -6,6 +6,7 @@
 #include "../Scene/TitleScene.h"
 #include "../Scene/GameScene.h"
 #include "../Scene/ResultScene.h"
+#include "../Scene/MenuScene.h"
 #include "Camera.h"
 #include "ResourceManager.h"
 #include "SceneManager.h"
@@ -196,6 +197,18 @@ void SceneManager::OnReachNest(void)
 	ChangeScene(SCENE_ID::RESULT);
 }
 
+void SceneManager::OpenMenu()
+{
+	prevSceneType_ = sceneId_; // åªç›ÇÃÉVÅ[ÉìÇãLò^ 
+	ChangeScene(SCENE_ID::MENU);
+}
+
+void SceneManager::ReturnPrevScene()
+{
+	skipReset_ = true;
+	ChangeScene(prevSceneType_);
+}
+
 void SceneManager::SetResult(ResultScene::RESULT_TYPE type)
 {
 	resultType_ = type;
@@ -255,6 +268,9 @@ void SceneManager::DoChangeScene(SCENE_ID sceneId)
 		break;
 	case SCENE_ID::RESULT:
 		scene_ = std::make_unique<ResultScene>();
+		break;
+	case SCENE_ID::MENU:
+		scene_ = std::make_unique<MenuScene>();
 		break;
 	}
 

@@ -27,6 +27,7 @@ public:
 		TITLE,
 		GAME,
 		RESULT,
+		MENU,
 	};
 	
 	// インスタンスの生成
@@ -64,6 +65,11 @@ public:
 
 	// 巣に到達したときの処理
 	void OnReachNest(void);
+
+	void OpenMenu(); // メニューを開く
+	void ReturnPrevScene(); // 直前のシーンに戻る
+	SCENE_ID prevSceneType_;                      // 直前のシーン
+	bool skipReset_;
 
 	void SetResult(ResultScene::RESULT_TYPE type);	// リザルトタイプの設定
 	ResultScene::RESULT_TYPE GetResult(void);		// リザルトタイプの取得

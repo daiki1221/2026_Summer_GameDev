@@ -1,6 +1,7 @@
 #include <DxLib.h>
 #include <string>
 #include <memory>
+#include <algorithm>
 #include "../../Application.h"
 #include "../../Utility/AsoUtility.h"
 #include "../../Manager/InputManager.h"
@@ -11,6 +12,8 @@
 #include "../Common/Capsule.h"
 #include "../Common/Collider.h"
 #include "Planet.h"
+#include "Bullet.h"
+#include "Enemy.h"
 #include "Player.h"
 
 Player::Player(void)
@@ -36,6 +39,11 @@ Player::Player(void)
 	gravHitPosUp_ = AsoUtility::VECTOR_ZERO;
 
 	imgShadow_ = -1;
+
+	isAttack_ = false;
+	attackTime_ = 0.0f;
+
+	enemy_ = nullptr;
 
 	capsule_ = nullptr;
 
@@ -68,6 +76,9 @@ void Player::Init(void)
 	// 丸影画像
 	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
 
+	aimDir_ = AsoUtility::VECTOR_ZERO;
+	isAiming_ = false;
+
 	// 初期状態
 	ChangeState(STATE::PLAY);
 }
@@ -85,20 +96,55 @@ void Player::Update(void)
 		break;
 	}
 
+	for (auto& bullet : bullet_)
+	{
+		bullet->Update();
+	}
+
 	// モデル制御更新
 	transform_.Update();
 
 	// アニメーション再生
 	animationController_->Update();
+
+	bullet_.erase(
+		std::remove_if(
+			bullet_.begin(),
+			bullet_.end(),
+			[](const auto& b)
+			{
+				return b->IsDead();
+			}),
+		bullet_.end());
+
+
 }
 
 void Player::Draw(void)
 {
+	for (auto& bullet : bullet_)
+	{
+		bullet->Draw();
+	}
+
 	// モデルの描画
 	MV1DrawModel(transform_.modelId);
 
 	// 丸影描画
 	DrawShadow();
+
+	// エイムカーソル描画
+	if (isAiming_)
+	{
+		DrawCircle(
+			Application::SCREEN_SIZE_X / 2,
+			Application::SCREEN_SIZE_Y / 2,
+			5,
+			GetColor(255, 0, 0),
+			TRUE
+		);
+	}
+
 }
 
 void Player::AddCollider(Collider* collider)
@@ -172,6 +218,9 @@ void Player::UpdatePlay(void)
 	// ジャンプ処理
 	ProcessJump();
 
+	// 攻撃処理
+	ProcessAtttack();
+
 	// 移動方向に応じた回転
 	Rotate();
 
@@ -180,6 +229,8 @@ void Player::UpdatePlay(void)
 
 	// 衝突判定
 	Collision();
+
+
 
 	// 回転させる
 	transform_.quaRot = playerRotY_;
@@ -280,8 +331,6 @@ void Player::DrawShadow(void)
 
 }
 
-
-
 const VECTOR& Player::GetPos(void) const
 {
 	return transform_.pos;
@@ -340,7 +389,7 @@ void Player::ProcessMove(void)
 
 		// 移動処理
 		speed_ = SPEED_MOVE;
-		if (ins.IsNew(KEY_INPUT_RSHIFT))
+		if (ins.IsNew(KEY_INPUT_LSHIFT))
 		{
 			speed_ = SPEED_RUN;
 		}
@@ -353,7 +402,7 @@ void Player::ProcessMove(void)
 		if (!isJump_ && IsEndLanding())
 		{
 			// アニメーション
-			if (ins.IsNew(KEY_INPUT_RSHIFT))
+			if (ins.IsNew(KEY_INPUT_LSHIFT))
 			{
 				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
 			}
@@ -414,6 +463,27 @@ void Player::ProcessJump(void)
 
 }
 
+void Player::ProcessAtttack(void)
+{
+	auto& ins = InputManager::GetInstance();
+
+	// 右クリック：照準ON（表示だけ）
+	if (ins.IsTrgMouseRight())
+	{
+		isAiming_ = !isAiming_; // トグルでもOK
+	}
+
+	// 左クリック：発射（常に現在カメラ方向）
+	if (ins.IsTrgMouseLeft())
+	{
+		VECTOR dir = SceneManager::GetInstance()
+			.GetCamera()
+			->GetForward();
+
+		WaterBullet(dir);
+	}
+}
+
 void Player::SetGoalRotate(double rotRad)
 {
 	VECTOR cameraRot = SceneManager::GetInstance().GetCamera()->GetAngles();
@@ -450,6 +520,25 @@ void Player::Collision(void)
 
 	// 衝突(重力)
 	CollisionGravity();
+
+	// ステージ範囲制限
+	if (movedPos_.x < -4100.0f)
+	{
+		movedPos_.x = -4100.0f;
+	}
+	else if (movedPos_.x > 3900.0f)
+	{
+		movedPos_.x = 3900.0f;
+	}
+
+	if (movedPos_.z < -4300.0f)
+	{
+		movedPos_.z = -4300.0f;
+	}
+	else if (movedPos_.z > 4100.0f)
+	{
+		movedPos_.z = 4100.0f;
+	}
 
 	// 移動
 	transform_.pos = movedPos_;
@@ -610,6 +699,27 @@ bool Player::IsEndLanding(void)
 	}
 
 	return false;
+}
+
+void Player::WaterBullet(const VECTOR& dir)
+{
+	VECTOR pos = VAdd(transform_.pos, VScale(dir, 50.0f));
+
+	bullet_.push_back(
+		std::make_shared<Bullet>(pos, VNorm(dir))
+	);
+
+	animationController_->Play((int)ANIM_TYPE::ATTACK, false);
+}
+
+const std::vector<std::shared_ptr<Bullet>>& Player::GetBullet() const
+{
+	return bullet_;
+}
+
+void Player::SetEnemy(Enemy* enemy)
+{
+	enemy_ = enemy;
 }
 
 VECTOR Player::GetForward(void) const

@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Scene\MenuScene.cpp" />
+    <ClCompile Include="Src\Object\Actor\Bullet.cpp" />
     <ClCompile Include="Src\Object\Actor\Enemy.cpp" />
     <ClCompile Include="Src\Scene\ResultScene.cpp" />
     <ClCompile Include="Src\Object\Actor\Duckling.cpp" />
@@ -48,6 +50,8 @@
     <ClCompile Include="Src\Object\Common\Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Scene\MenuScene.h" />
+    <ClInclude Include="Src\Object\Actor\Bullet.h" />
     <ClInclude Include="Src\Object\Actor\Enemy.h" />
     <ClInclude Include="Src\Scene\ResultScene.h" />
     <ClInclude Include="Src\Object\Actor\Duckling.h" />

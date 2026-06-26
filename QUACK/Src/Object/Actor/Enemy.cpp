@@ -29,6 +29,9 @@ Enemy::Enemy(void)
 	gravHitPosDown_ = AsoUtility::VECTOR_ZERO;
 	gravHitPosUp_ = AsoUtility::VECTOR_ZERO;
 
+	hitColorTimer_ = 0.0f;
+	isHit_ = false;
+
 	capsule_ = nullptr;
 
 }
@@ -58,6 +61,8 @@ void Enemy::Init(void)
 
 	targetPos_ = transform_.pos;
 	targetTimer_ = 0.0f;
+
+	hp_ = 100;
 	
 }
 
@@ -65,12 +70,55 @@ void Enemy::Update(void)
 {
 	UpdatePlay();
 	transform_.Update();
+
+	if (isHit_)
+	{
+		hitColorTimer_ -= scnMng_.GetDeltaTime();
+		if (hitColorTimer_ <= 0.0f)
+		{
+			isHit_ = false;
+		}
+	}
+
 }
 
 void Enemy::Draw(void)
 {
-	// モデルの描画
+	bool flash = ((int)(hitColorTimer_ * 5) % 2) == 0;
+
+	if (isHit_ && flash)
+	{
+		MV1SetDifColorScale(
+			transform_.modelId,
+			GetColorF(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	else
+	{
+		MV1SetDifColorScale(
+			transform_.modelId,
+			GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	DrawShadow();
 	MV1DrawModel(transform_.modelId);
+}
+
+void Enemy::Damage(int damage)
+{
+	hp_ -= damage;
+
+	if (hp_ < 0)
+	{
+		hp_ = 0;
+	}
+
+	isHit_ = true;
+	hitColorTimer_ = 0.2f;
+}
+
+bool Enemy::IsDead() const
+{
+	return hp_ <= 0;
 }
 
 void Enemy::AddCollider(Collider* collider)
@@ -231,40 +279,35 @@ const Transform* Enemy::GetTransform() const
 void Enemy::ProcessMove(void)
 {
 	targetTimer_ -= scnMng_.GetDeltaTime();
-	float t = GetNowCount() * 0.001f;
 
-	// 3秒ごとに新しい目標を決める
+	// 目標地点を再設定
 	if (targetTimer_ <= 0.0f)
 	{
-		targetTimer_ = 3.0f;
+		targetTimer_ = 3.0f; // 2秒ごとに変更
 
-		targetPos_.x = transform_.pos.x + (rand() % 1000 - 500);
-		targetPos_.y = 300.0f + sinf(t * 2.0f) * 50.0f;
-		targetPos_.z = transform_.pos.z + (rand() % 1000 - 500);
+		targetPos_.x = (float)(rand() % 2000 - 1000);
+		targetPos_.y = (float)(rand() % 500 + 100);
+		targetPos_.z = (float)(rand() % 2000 - 1000);
 	}
 
-	VECTOR toTarget =
-		VSub(targetPos_, transform_.pos);
+	VECTOR dir = VSub(targetPos_, transform_.pos);
 
-	float dist = VSize(toTarget);
+	float dist = VSize(dir);
 
-	if (dist > 5.0f)
+	if (dist > 1.0f)
 	{
-		VECTOR dir = VNorm(toTarget);
+		dir = VNorm(dir);
 
 		speed_ = 2.0f;
-
 		movePow_ = VScale(dir, speed_);
 
-		double rotY =
-			atan2(dir.x, dir.z)
-			- DX_PI_F / 4.0f;
-
+		// 向きを移動方向に合わせる
+		float rotY = atan2f(dir.x, dir.z);
 		SetGoalRotate(rotY);
 	}
 	else
 	{
-		movePow_ = AsoUtility::VECTOR_ZERO;
+		movePow_ = VGet(0.0f, 0.0f, 0.0f);
 	}
 }
 

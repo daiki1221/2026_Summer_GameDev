@@ -10,6 +10,7 @@
 #include "../Object/Actor/Planet.h"
 #include "../Object/Actor/Duckling.h"
 #include "../Object/Actor/Enemy.h"
+#include "../Object/Actor/Bullet.h"
 #include "GameScene.h"
 
 GameScene::GameScene(void)
@@ -24,11 +25,16 @@ GameScene::~GameScene(void)
 
 void GameScene::Init(void)
 {
+
+	pattern = rand() % patterns.size();
+
 	player_ = std::make_shared<Player>();
 	player_->Init();
 
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Init();
+
+	player_->SetEnemy(enemy_.get());
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -38,11 +44,8 @@ void GameScene::Init(void)
 
 		duck->SetFollowIndex(i);
 
-		duck->SetPos({
-			i * 50.0f,
-			-30.0f,
-			1000.0f
-			});
+		// 初期座標の設定
+		duck->SetPos(patterns[pattern][i]);
 
 		duck->SetPlayer(player_.get());
 
@@ -86,16 +89,10 @@ void GameScene::Update(void)
 	}
 
 
-	// シーン遷移
-	auto const& ins = InputManager::GetInstance();
-	if (ins.IsTrgDown(KEY_INPUT_SPACE))
-	{
-		sceMng_.ChangeScene(SceneManager::SCENE_ID::TITLE);
-	}
 	stage_->Update();
 
 	player_->Update();
-
+	
 	enemy_->Update();
 
 	for (auto& duck : duckling_)
@@ -104,7 +101,7 @@ void GameScene::Update(void)
 	}
 
 	VECTOR nestPos = { -100.0f, -100.0f, 300.0f };
-	const float NEST_RADIUS = 50.0f;           // 判定用半径
+	const float NEST_RADIUS = 100.0f;           // 判定用半径
 	int reachCount = 0;
 
 	for (auto& duck : duckling_)
@@ -122,17 +119,48 @@ void GameScene::Update(void)
 		SceneManager::GetInstance().OnReachNest();
 	}
 
-	
+	auto const& bullet_ = player_->GetBullet();
+
+	for (auto& bullet : bullet_)
+	{
+
+		VECTOR diff =
+			VSub(enemy_->GetPos(),
+				bullet->GetPos());
+
+		float distance = VSize(diff);
+
+		if (distance < 100.0f)
+		{
+			enemy_->Damage(10);
+			bullet->SetDead();
+		}
+	}
+
+	if (enemy_->IsDead())
+	{
+		enemy_->SetPos({ -1000.0f, 500.0f, 1000.0f });
+	}
+
+	auto const& ins = InputManager::GetInstance();
+	if (ins.IsTrgDown(KEY_INPUT_TAB))
+	{
+		SceneManager::GetInstance().OpenMenu();
+	}
+
 }
 
 void GameScene::Draw(void)
 {
+
 	// ステージの描画
 	stage_->Draw();
 
+	enemy_->Draw();
+
 	player_->Draw();
 
-	enemy_->Draw();
+	
 
 	for (auto& duck : duckling_)
 	{
@@ -142,6 +170,16 @@ void GameScene::Draw(void)
 	// 残り時間を描画
 	int timeDisplay = static_cast<int>(time_);
 	DrawFormatString(50, 65, GetColor(255, 255, 255), "TIME: %d", timeDisplay);
+
+	// プレイヤー座標表示
+	VECTOR pos = player_->GetPos();
+
+	DrawFormatString(
+		50, 90,
+		GetColor(255, 255, 0),
+		"POS X: %.2f Y: %.2f Z: %.2f",
+		pos.x, pos.y, pos.z);
+
 
 }
 

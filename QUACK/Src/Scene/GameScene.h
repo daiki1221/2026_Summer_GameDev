@@ -7,6 +7,7 @@ class Stage;
 class Player;
 class Duckling;
 class Enemy;
+class Bullet;
 
 class GameScene : public SceneBase
 {
@@ -41,7 +42,29 @@ private:
 
 	std::unique_ptr<Enemy> enemy_;
 
+	std::vector<std::shared_ptr<Bullet>> bullet_;
+
 	float time_; //Žc‚èŽžŠÔ
 
+	int pattern;
+
+	std::vector<std::vector<VECTOR>> patterns =
+	{
+		{
+			{-1500,-96, 2280},
+			{-1000,-13,-3500},
+			{ 3800,-60,-2360}
+		},
+		{
+			{   76,  34, 2155},
+			{-3743,-186, 3952},
+			{  960,-106,-3536}
+		},
+		{
+			{   76, 34, 2155},
+			{  300,-30,  800},
+			{ 3800,-60,-2360}
+		}
+	};
 	
 };
