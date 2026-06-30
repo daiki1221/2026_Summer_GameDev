@@ -66,5 +66,10 @@ private:
 			{ 3800,-60,-2360}
 		}
 	};
+
+	bool isNestMessage_;
+	bool isNestMessageDisplayed_;
+	float nestMessageTimer_;
 	
+	int imgNestMessage_;
 };

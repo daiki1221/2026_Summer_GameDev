@@ -79,17 +79,6 @@ void Duckling::Init(void)
 
 void Duckling::Update(void)
 {
-	if (isFoundPlayer_ && !isFollowing_)
-	{
-		foundTimer_ += scnMng_.GetDeltaTime();
-
-		if (foundTimer_ >= FOUND_TIME)
-		{
-			isFollowing_ = true;
-			foundTimer_ = 0.0f;
-		}
-	}
-
 	UpdatePlay();
 	// ÉÇÉfÉãêßå‰çXêV
 	transform_.Update();
@@ -117,6 +106,12 @@ void Duckling::Draw(void)
 			0.0f,     
 			imgExclamation_,
 			TRUE);
+
+		DrawString(
+			Application::SCREEN_SIZE_X / 2 - 40,
+			Application::SCREEN_SIZE_Y - 80,
+			"F : Ç–Ç»ÇèïÇØÇÈ",
+			GetColor(255, 255, 255));
 
 	}
 	
@@ -650,6 +645,16 @@ VECTOR Duckling::GetForward(void) const
 bool Duckling::IsFollowing(void) const
 {
 	return isFollowing_;
+}
+
+void Duckling::StartFollowing(void)
+{
+	isFollowing_ = true;
+}
+
+bool Duckling::IsFoundPlayer(void) const
+{
+	return isFoundPlayer_;
 }
 
 

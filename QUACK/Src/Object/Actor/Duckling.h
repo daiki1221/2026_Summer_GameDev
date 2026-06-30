@@ -67,6 +67,10 @@ class Duckling : public ActorBase
 
 	bool IsFollowing(void) const;
 
+	void StartFollowing(void);
+	bool IsFoundPlayer(void) const;
+
+
 private:
 	// アニメーション制御
 	std::unique_ptr<AnimationController> animationController_;

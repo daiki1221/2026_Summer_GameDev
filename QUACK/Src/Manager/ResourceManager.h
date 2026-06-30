@@ -19,6 +19,7 @@ public:
 		SKY_DOME,
 		ENEMY,
 		ECXL,
+		GUIDE,
 	};
 
 	// 明示的にインステンスを生成する

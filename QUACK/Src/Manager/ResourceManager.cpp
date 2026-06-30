@@ -63,6 +63,10 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "Exclamation.png");
 	resourcesMap_.emplace(SRC::ECXL, res);
 
+	// 巣を目指すメッセージ
+	res = new RES(RES_T::IMG, PATH_IMG + "NestGuide.png");
+	resourcesMap_.emplace(SRC::GUIDE, res);
+
 }
 
 void ResourceManager::Release(void)

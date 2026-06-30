@@ -138,10 +138,10 @@ void Player::Draw(void)
 	{
 		DrawCircle(
 			Application::SCREEN_SIZE_X / 2,
-			Application::SCREEN_SIZE_Y / 2,
-			5,
-			GetColor(255, 0, 0),
-			TRUE
+			Application::SCREEN_SIZE_Y / 1.9,
+			40,                    // îºåa
+			GetColor(0, 255, 255),   // êÖêF
+			FALSE                  // ògÇæÇØ
 		);
 	}
 
@@ -703,7 +703,10 @@ bool Player::IsEndLanding(void)
 
 void Player::WaterBullet(const VECTOR& dir)
 {
-	VECTOR pos = VAdd(transform_.pos, VScale(dir, 50.0f));
+	VECTOR pos = transform_.pos;
+
+	pos = VAdd(pos, { 0.0f, 40.0f, 0.0f });   // è„Ç÷40
+	pos = VAdd(pos, VScale(dir, 50.0f));    // ëOÇ÷50
 
 	bullet_.push_back(
 		std::make_shared<Bullet>(pos, VNorm(dir))
