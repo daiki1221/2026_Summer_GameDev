@@ -3,11 +3,13 @@
 #include <vector>
 #include <memory>
 #include "ActorBase.h"
+#include "FeatherParticle.h"
 class AnimationController;
 class Collider;
 class Capsule;
 class Bullet;
 class Enemy;
+class FeatherParticle;
 
 class Player : public ActorBase
 {
@@ -85,6 +87,9 @@ public:
 
 	void SetEnemy(Enemy* enemy);
 
+	void Damage(int damage);
+	bool IsDead(void) const;
+
 private:
 	// アニメーション制御
 	std::unique_ptr<AnimationController> animationController_;
@@ -128,6 +133,8 @@ private:
 	// 衝突判定に用いられるコライダ
 	std::vector<Collider*> colliders_;
 	std::unique_ptr<Capsule> capsule_;
+	
+	std::vector<FeatherParticle> feathers_;
 
 	// 衝突チェック
 	VECTOR gravHitPosDown_;
@@ -140,6 +147,10 @@ private:
 	float attackTime_;
 
 	static constexpr float TIME_ATTACK = 0.5f;
+
+	int hp_;
+	bool isHit_;
+	float hitColorTimer_;
 
 	void InitAnimation(void);
 

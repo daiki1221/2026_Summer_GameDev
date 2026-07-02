@@ -37,6 +37,7 @@ void GameScene::Init(void)
 	enemy_->Init();
 	// プレイヤーに敵を設定
 	player_->SetEnemy(enemy_.get());
+	enemy_->SetPlayer(player_.get());
 	
 	for (int i = 0; i < 3; i++)
 	{
@@ -245,5 +246,10 @@ void GameScene::Draw(void)
 			"3羽そろった！巣へ帰ろう！",
 			GetColor(255, 255, 0));
 	}
+	DrawFormatString(
+		20, 120,
+		GetColor(255, 255, 255),
+		"Pattern : %d",
+		pattern);
 }
 

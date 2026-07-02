@@ -5,6 +5,7 @@
 class AnimationController;
 class Collider;
 class Capsule;
+class Player;
 
 class Enemy : public ActorBase
 {
@@ -27,6 +28,13 @@ public:
 	// アニメーションの再生速度
 	static constexpr float SPEED_ANIM = 20.0f;
 
+	// 発見距離
+	static constexpr float FIND_DISTANCE = 1000.0f; 
+	// 攻撃開始
+	static constexpr float ATTACK_DISTANCE = 700.0f; 
+	// 攻撃後の回復距離
+	static constexpr float RECOVER_DISTANCE = 1100.0f;
+
 	int hp_;
 	float hitColorTimer_;
 	bool isHit_;
@@ -41,6 +49,14 @@ public:
 		FAST_RUN,
 		JUMP,
 		MAX,
+	};
+
+	enum class STATE
+	{
+		NONE,    // 徘徊
+		CHASE,     // 発見
+		ATTACK,    // 突撃
+		RECOVER    // 突撃後の硬直
 	};
 
 	// コンストラクタ
@@ -71,8 +87,19 @@ public:
 	void Damage(int damage);
 	bool IsDead(void) const;
 
+	void SetPlayer(Player* player);
 
 private:
+
+	STATE state_;
+
+	// 攻撃中かどうか
+	float findDistance_;
+	// 突撃中のタイマー
+	float chargeTimer_;
+
+	// 攻撃クールタイム
+	float attackCoolTime_;
 
 	VECTOR targetPos_;
 	float targetTimer_;

@@ -20,6 +20,7 @@ public:
 		ENEMY,
 		ECXL,
 		GUIDE,
+		FEATHER,
 	};
 
 	// 明示的にインステンスを生成する

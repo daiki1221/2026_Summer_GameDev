@@ -60,10 +60,18 @@ void Enemy::Init(void)
 	capsule_->SetRadius(20.0f);
 
 	targetPos_ = transform_.pos;
+	targetPos_.y = -80.0f;
 	targetTimer_ = 0.0f;
 
 	hp_ = 100;
+
+	findDistance_ = FIND_DISTANCE;
+	chargeTimer_ = 0.0f;
+
+	state_ = STATE::NONE;
 	
+	attackCoolTime_ = 3.0f;
+
 }
 
 void Enemy::Update(void)
@@ -80,6 +88,7 @@ void Enemy::Update(void)
 		}
 	}
 
+	
 }
 
 void Enemy::Draw(void)
@@ -121,6 +130,11 @@ bool Enemy::IsDead() const
 	return hp_ <= 0;
 }
 
+void Enemy::SetPlayer(Player* player)
+{
+	player_ = player;
+}
+
 void Enemy::AddCollider(Collider* collider)
 {
 	colliders_.push_back(collider);
@@ -152,10 +166,114 @@ void Enemy::UpdateNone(void)
 
 void Enemy::UpdatePlay(void)
 {
+	if (attackCoolTime_ > 0.0f)
+	{
+		attackCoolTime_ -= scnMng_.GetDeltaTime();
+	}
 
-	// à⁄ìÆèàóù
-	ProcessMove();
+	switch (state_)
+	{
+	case STATE::NONE:
+	{
+		ProcessMove();
 
+		VECTOR dir = VSub(player_->GetPos(), transform_.pos);
+
+		if (VSize(dir) < FIND_DISTANCE &&
+			attackCoolTime_ <= 0.0f)
+		{
+			state_ = STATE::CHASE;
+		}
+		break;
+	}
+
+	case STATE::CHASE:
+	{
+		VECTOR toPlayer =
+			VSub(player_->GetPos(), transform_.pos);
+
+		float dist = VSize(toPlayer);
+
+		VECTOR dir = VNorm(toPlayer);
+
+		// Ç‰Ç¡Ç≠ÇËí«Ç§
+		speed_ = 2.0f;
+		movePow_ = VScale(dir, speed_);
+
+		float rotY = atan2f(dir.x, dir.z);
+		SetGoalRotate(rotY);
+
+		// ãﬂÇ∑Ç¨ÇΩÇÁçUåÇÇ÷
+		if (dist < ATTACK_DISTANCE)
+		{
+			state_ = STATE::ATTACK;
+
+			// çUåÇï˚å¸å≈íËÅiÇ±Ç±èdóvÅFí«îˆñ\ÇÍñhé~Åj
+			moveDir_ = VNorm(VSub(player_->GetPos(), transform_.pos));
+
+			chargeTimer_ = 1.0f; // è≠Çµó≠ÇﬂÇÈÇ∆ÇªÇÍÇ¡Ç€Ç¢
+		}
+
+		// âìÇ≠Ç»Ç¡ÇΩÇÁñﬂÇÈ
+		if (dist > FIND_DISTANCE * 1.5f)
+		{
+			state_ = STATE::NONE;
+		}
+
+		break;
+	}
+
+	case STATE::ATTACK:
+	{
+		speed_ = 10.0f;
+		movePow_ = VScale(moveDir_, speed_);
+
+		chargeTimer_ -= scnMng_.GetDeltaTime();
+
+		if (chargeTimer_ <= 0.0f)
+		{
+			state_ = STATE::RECOVER;
+			chargeTimer_ = 1.0f;
+
+			attackCoolTime_ = 3.0f;
+		}
+		// è’ìÀîªíË
+		const Capsule* playerCap = player_->GetCapsule();
+
+		if (HitCheck_Capsule_Capsule(
+			capsule_->GetPosTop(),
+			capsule_->GetPosDown(),
+			capsule_->GetRadius(),
+			playerCap->GetPosTop(),
+			playerCap->GetPosDown(),
+			playerCap->GetRadius()))
+		{
+			player_->Damage(30);
+
+			state_ = STATE::RECOVER;
+		}
+
+		break;
+	}
+
+	case STATE::RECOVER:
+	{
+		VECTOR away = VGet(0.0f, 1.0f, 0.0f);
+
+		speed_ = 10.0f;
+		movePow_ = VScale(away, speed_);
+
+		float dist = transform_.pos.y - player_->GetPos().y;
+
+		if (dist >= RECOVER_DISTANCE)
+		{
+			state_ = STATE::NONE;
+		}
+
+		break;
+	}
+
+	}
 	// à⁄ìÆï˚å¸Ç…âûÇ∂ÇΩâÒì]
 	Rotate();
 

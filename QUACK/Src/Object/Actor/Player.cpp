@@ -79,6 +79,10 @@ void Player::Init(void)
 	aimDir_ = AsoUtility::VECTOR_ZERO;
 	isAiming_ = false;
 
+	hp_ = 90;
+	isHit_ = false;
+	hitColorTimer_ = 0.0f;
+
 	// 初期状態
 	ChangeState(STATE::PLAY);
 }
@@ -117,6 +121,38 @@ void Player::Update(void)
 			}),
 		bullet_.end());
 
+	// ヒット時の色変化タイマー
+	if (isHit_)
+	{
+		hitColorTimer_ -= scnMng_.GetDeltaTime();
+
+		if (hitColorTimer_ <= 0.0f)
+		{
+			isHit_ = false;
+		}
+	}
+	// 羽根パーティクルの更新
+	for (auto& feather : feathers_)
+	{
+		feather.Update();
+	}
+
+	feathers_.erase(
+		std::remove_if(
+			feathers_.begin(),
+			feathers_.end(),
+			[](const FeatherParticle& f)
+			{
+				return f.IsDead();
+			}),
+		feathers_.end());
+
+	// HPが0になったらゲームオーバー
+	if (IsDead())
+	{
+		SceneManager::GetInstance().SetResult(ResultScene::RESULT_TYPE::OVER);
+		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::RESULT);
+	}
 
 }
 
@@ -126,9 +162,6 @@ void Player::Draw(void)
 	{
 		bullet->Draw();
 	}
-
-	// モデルの描画
-	MV1DrawModel(transform_.modelId);
 
 	// 丸影描画
 	DrawShadow();
@@ -145,6 +178,36 @@ void Player::Draw(void)
 		);
 	}
 
+	// ヒット時の色変化
+	bool flash = ((int)(hitColorTimer_ * 5) % 2) == 0;
+
+	if (isHit_ && flash)
+	{
+		MV1SetDifColorScale(
+			transform_.modelId,
+			GetColorF(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+	else
+	{
+		MV1SetDifColorScale(
+			transform_.modelId,
+			GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	// HP表示
+	DrawFormatString(
+		20, 20,
+		GetColor(255, 255, 255),
+		"HP : %d",
+		hp_);
+
+	// モデルの描画
+	MV1DrawModel(transform_.modelId);
+	// 羽根パーティクルの描画
+	for (auto& feather : feathers_)
+	{
+		feather.Draw();
+	}
 }
 
 void Player::AddCollider(Collider* collider)
@@ -723,6 +786,31 @@ const std::vector<std::shared_ptr<Bullet>>& Player::GetBullet() const
 void Player::SetEnemy(Enemy* enemy)
 {
 	enemy_ = enemy;
+}
+
+void Player::Damage(int damage)
+{
+	hp_ -= damage;
+
+	if (hp_ < 0)
+	{
+		hp_ = 0;
+	}
+
+	isHit_ = true;
+	hitColorTimer_ = 1.0f;
+
+	for (int i = 0; i < 15; i++)
+	{
+		FeatherParticle f;
+		f.Init(transform_.pos);
+		feathers_.push_back(f);
+	}
+}
+
+bool Player::IsDead(void) const
+{
+	return hp_ <= 0;
 }
 
 VECTOR Player::GetForward(void) const

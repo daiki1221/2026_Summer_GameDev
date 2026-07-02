@@ -67,6 +67,10 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "NestGuide.png");
 	resourcesMap_.emplace(SRC::GUIDE, res);
 
+	// âHç™
+	res = new RES(RES_T::IMG, PATH_IMG + "Feather.png");
+	resourcesMap_.emplace(SRC::FEATHER, res);
+
 }
 
 void ResourceManager::Release(void)
