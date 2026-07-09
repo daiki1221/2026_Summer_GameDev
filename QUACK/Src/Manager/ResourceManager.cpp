@@ -32,7 +32,7 @@ void ResourceManager::Init(void)
 	Resource* res;
 
 	// プレイヤー
-	res = new RES(RES_T::MODEL, PATH_MDL + "Player/duck2.mv1");
+	res = new RES(RES_T::MODEL, PATH_MDL + "Player/duck.mv1");
 	resourcesMap_.emplace(SRC::PLAYER, res);
 
 	// プレイヤー影

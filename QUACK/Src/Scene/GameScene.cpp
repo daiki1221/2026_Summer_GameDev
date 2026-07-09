@@ -82,10 +82,82 @@ void GameScene::Init(void)
 	imgNestMessage_ = -1;
 	imgNestMessage_ =
 		ResourceManager::GetInstance().Load(ResourceManager::SRC::GUIDE).handleId_;
+
+	isPause_ = false;
+
+	pauseSelect_ = PAUSE_SELECT::RESUME;
+
+	pauseMenuY_[0] = Application::SCREEN_SIZE_Y / 2;
+	pauseMenuY_[1] = Application::SCREEN_SIZE_Y / 2 + 60;
+	pauseMenuY_[2] = Application::SCREEN_SIZE_Y / 2 + 120;
 }
 
 void GameScene::Update(void)
 {
+	auto const& ins = InputManager::GetInstance();
+
+	// ポーズ切り替え
+	if (ins.IsTrgDown(KEY_INPUT_TAB))
+	{
+		isPause_ = !isPause_;
+
+		SceneManager::GetInstance()
+			.GetCamera()
+			->SetMouseControl(isPause_);
+		SetMouseDispFlag(isPause_);
+	}
+
+	// ポーズ中
+	if (isPause_)
+	{
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (IsMouseOnPauseMenu(i))
+			{
+				pauseSelect_ = (PAUSE_SELECT)i;
+			}
+		}
+
+		static int oldMouse = 0;
+
+		int mouse = GetMouseInput();
+
+		bool click =
+			(mouse & MOUSE_INPUT_LEFT) &&
+			!(oldMouse & MOUSE_INPUT_LEFT);
+
+		oldMouse = mouse;
+
+		if (click)
+		{
+			switch (pauseSelect_)
+			{
+
+			case PAUSE_SELECT::RESUME:
+
+				isPause_ = false;
+
+				break;
+
+
+			case PAUSE_SELECT::GUIDE:
+
+				// 操作説明シーンへ
+				break;
+
+
+			case PAUSE_SELECT::TITLE:
+
+				SceneManager::GetInstance()
+					.ChangeScene(
+						SceneManager::SCENE_ID::TITLE);
+				break;
+			}
+		}
+		return;
+	}
+
 	time_ -= 1.0f / 60.0f;
 
 	if (time_ <= 0.0f)
@@ -172,14 +244,6 @@ void GameScene::Update(void)
 		}
 	}
 
-	if (enemy_->IsDead())
-	{
-		enemy_->SetPos({ -1000.0f, 500.0f, 1000.0f });
-	}
-
-
-	auto const& ins = InputManager::GetInstance();
-
 	if (ins.IsTrgDown(KEY_INPUT_F))
 	{
 		for (auto& duck : duckling_)
@@ -195,11 +259,7 @@ void GameScene::Update(void)
 		}
 	}
 
-
-	if (ins.IsTrgDown(KEY_INPUT_TAB))
-	{
-		SceneManager::GetInstance().OpenMenu();
-	}
+	
 
 }
 
@@ -224,32 +284,127 @@ void GameScene::Draw(void)
 	DrawFormatString(50, 65, GetColor(255, 255, 255), "TIME: %d", timeDisplay);
 
 	// プレイヤー座標表示
-	VECTOR pos = player_->GetPos();
+/*	VECTOR pos = player_->GetPos();
 
 	DrawFormatString(
 		50, 90,
 		GetColor(255, 255, 0),
 		"POS X: %.2f Y: %.2f Z: %.2f",
-		pos.x, pos.y, pos.z);
+		pos.x, pos.y, pos.z);*/
 
 	if (isNestMessage_)
 	{
 		DrawGraph(
-			Application::SCREEN_SIZE_X / 2 - 200,
-			50,
+			Application::SCREEN_SIZE_X /4,
+			10,
 			imgNestMessage_,
 			TRUE);
-
-		DrawString(
-			Application::SCREEN_SIZE_X / 2 - 80,
-			230,
-			"3羽そろった！巣へ帰ろう！",
-			GetColor(255, 255, 0));
 	}
-	DrawFormatString(
+	/*DrawFormatString(
 		20, 120,
 		GetColor(255, 255, 255),
 		"Pattern : %d",
-		pattern);
+		pattern);*/
+
+	if (isPause_)
+	{
+		DrawPauseMenu();
+	}
+}
+
+void GameScene::DrawPauseMenu(void)
+{
+	SetDrawBlendMode(
+		DX_BLENDMODE_ALPHA,
+		160);
+
+	DrawBox(
+		0,
+		0,
+		Application::SCREEN_SIZE_X,
+		Application::SCREEN_SIZE_Y,
+		GetColor(0, 0, 0),
+		TRUE);
+
+	SetDrawBlendMode(
+		DX_BLENDMODE_NOBLEND,
+		0);
+
+	const char* menu[3] =
+	{
+		"ゲームへ戻る",
+		"操作説明",
+		"タイトルへ戻る"
+	};
+
+	int x = Application::SCREEN_SIZE_X / 2 - 150;
+
+	int mouseX;
+	int mouseY;
+
+	GetMousePoint(&mouseX, &mouseY);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int y = pauseMenuY_[i];
+
+		bool hover =
+			IsMouseOnPauseMenu(i);
+
+		int color;
+
+		if (hover || (int)pauseSelect_ == i)
+		{
+			color = GetColor(255, 200, 0);
+		}
+		else
+		{
+			color = GetColor(100, 100, 100);
+		}
+
+		DrawBox(
+			x,
+			y,
+			x + 300,
+			y + 45,
+			color,
+			TRUE);
+
+		DrawBox(
+			x,
+			y,
+			x + 300,
+			y + 45,
+			GetColor(255, 255, 255),
+			FALSE);
+
+		DrawFormatString(
+			x + 80,
+			y + 12,
+			GetColor(255, 255, 255),
+			menu[i]);
+	}
+}
+
+bool GameScene::IsMouseOnPauseMenu(int index)
+{
+
+	int mx;
+	int my;
+
+	GetMousePoint(&mx, &my);
+
+
+	int x = Application::SCREEN_SIZE_X / 2 - 150;
+	int y = pauseMenuY_[index];
+
+
+	return
+		(
+			mx >= x &&
+			mx <= x + 300 &&
+			my >= y &&
+			my <= y + 45
+			);
 }
 

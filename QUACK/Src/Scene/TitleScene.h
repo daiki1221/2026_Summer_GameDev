@@ -27,4 +27,18 @@ private:
 
 	int image_;
 
+	enum class SELECT
+	{
+		START,
+		GUIDE,
+		END,
+	};
+
+	SELECT select_;
+
+	int menuY_[3];
+
+	void DrawMenu(void);
+
+	bool IsMouseOnMenu(int index);
 };

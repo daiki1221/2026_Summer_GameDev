@@ -79,7 +79,7 @@ void Player::Init(void)
 	aimDir_ = AsoUtility::VECTOR_ZERO;
 	isAiming_ = false;
 
-	hp_ = 90;
+	hp_ = 150;
 	isHit_ = false;
 	hitColorTimer_ = 0.0f;
 
@@ -231,8 +231,8 @@ void Player::InitAnimation(void)
 	std::string path = Application::PATH_MODEL + "Player/";
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
 	animationController_->Add((int)ANIM_TYPE::IDLE, path + "Idle.mv1", 20.0f);
-	animationController_->Add((int)ANIM_TYPE::RUN, path + "Run.mv1", 20.0f);
-	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "FastRun.mv1", 20.0f);
+	animationController_->Add((int)ANIM_TYPE::RUN, path + "duck_walk.mv1", 30.0f);
+	animationController_->Add((int)ANIM_TYPE::FAST_RUN, path + "duck_walk.mv1", 40.0f);
 	animationController_->Add((int)ANIM_TYPE::JUMP, path + "Jump.mv1", 60.0f);
 	/*animationController_->Add((int)ANIM_TYPE::WARP_PAUSE, path + "WarpPose.mv1", 60.0f);
 	animationController_->Add((int)ANIM_TYPE::FLY, path + "Flying.mv1", 60.0f);
@@ -419,7 +419,7 @@ void Player::ProcessMove(void)
 	double rotRad = 0;
 
 	VECTOR dir = AsoUtility::VECTOR_ZERO;
-
+	
 	// カメラ方向に前進したい
 	if (ins.IsNew(KEY_INPUT_W))
 	{
@@ -800,10 +800,16 @@ void Player::Damage(int damage)
 	isHit_ = true;
 	hitColorTimer_ = 1.0f;
 
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		FeatherParticle f;
-		f.Init(transform_.pos);
+		VECTOR pos = transform_.pos;
+		pos.y += 30.0f;
+		// ランダムに少しずらす
+		pos.x += (rand() % 40 - 20) * 0.1f;
+		pos.z += (rand() % 40 - 20) * 0.1f;
+
+		f.Init(pos);
 		feathers_.push_back(f);
 	}
 }

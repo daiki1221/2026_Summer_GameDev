@@ -72,4 +72,21 @@ private:
 	float nestMessageTimer_;
 	
 	int imgNestMessage_;
+
+	bool isPause_;
+
+	enum class PAUSE_SELECT
+	{
+		RESUME,
+		GUIDE,
+		TITLE,
+	};
+
+	PAUSE_SELECT pauseSelect_;
+
+	int pauseMenuY_[3];
+
+	void DrawPauseMenu(void);
+
+	bool IsMouseOnPauseMenu(int index);
 };

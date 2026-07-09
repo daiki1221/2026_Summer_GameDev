@@ -19,12 +19,12 @@ void FeatherParticle::Init(const VECTOR& pos)
     pos_ = pos;
 
     vel_ = VGet(
-        (rand() % 200 - 100) * 0.01f,
-        (rand() % 200) * 0.02f,
-        (rand() % 200 - 100) * 0.01f
+        (rand() % 200 - 100) * 0.005f,
+        (rand() % 50) * 0.002f,
+        (rand() % 200 - 100) * 0.005f
     );
 
-    rotSpeed_ = (rand() % 200 - 100) * 0.01f;
+    rotSpeed_ = (rand() % 200 - 100) * 0.004f;
     life_ = 1.0f;
     rot_ = 0.0f;
 
@@ -43,15 +43,23 @@ void FeatherParticle::Update()
         0.0f,
         (rand() % 100 - 50) * 0.0005f
     ));
-    vel_.x += sinf(rot_) * 0.01f;
-    vel_.y -= 0.02f;
+
+    // è≠ÇµÇæÇØç∂âEÇ…óhÇÍÇÈ
+    vel_.x += sinf(rot_) * 0.002f;
+    vel_.z += cosf(rot_) * 0.002f;
+
+    // ãÛãCíÔçR
+    vel_.x *= 0.98f;
+    vel_.z *= 0.98f;
+
+    // Ç‰Ç¡Ç≠ÇËóéÇøÇÈ
+    vel_.y -= 0.006f;
 
     pos_ = VAdd(pos_, vel_);
 
     rot_ += rotSpeed_;
 
     life_ -= 1.0f / 60.0f;
-
 
 }
 

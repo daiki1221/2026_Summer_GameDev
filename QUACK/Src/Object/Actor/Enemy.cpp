@@ -72,13 +72,12 @@ void Enemy::Init(void)
 	
 	attackCoolTime_ = 3.0f;
 
+	deadTimer_ = 5.0f;
+
 }
 
 void Enemy::Update(void)
 {
-	UpdatePlay();
-	transform_.Update();
-
 	if (isHit_)
 	{
 		hitColorTimer_ -= scnMng_.GetDeltaTime();
@@ -88,11 +87,31 @@ void Enemy::Update(void)
 		}
 	}
 
-	
+	if (IsDead())
+	{
+		deadTimer_ -= scnMng_.GetDeltaTime();
+
+		if (deadTimer_ <= 0.0f)
+		{
+			Respawn();
+		}
+		return;
+	}
+	UpdatePlay();
+
+	// アニメーション再生
+	animationController_->Update();
+
+	transform_.Update();
 }
 
 void Enemy::Draw(void)
 {
+	if (IsDead())
+	{
+		return;
+	}
+
 	bool flash = ((int)(hitColorTimer_ * 5) % 2) == 0;
 
 	if (isHit_ && flash)
@@ -135,6 +154,46 @@ void Enemy::SetPlayer(Player* player)
 	player_ = player;
 }
 
+void Enemy::Respawn(void)
+{
+	deadTimer_ = 5.0f;
+
+	// HP回復
+	hp_ = 100;
+
+	// 空中ランダム位置
+	transform_.pos.x = (float)(rand() % 2000 - 1000);
+	transform_.pos.y = (float)(rand() % 500 + 200);  // 高さ200～700
+	transform_.pos.z = (float)(rand() % 2000 - 1000);
+
+	// 回転リセット
+	playerRotY_ = Quaternion();
+	goalQuaRot_ = Quaternion();
+
+	// 移動停止
+	movePow_ = AsoUtility::VECTOR_ZERO;
+
+	// 徘徊状態へ
+	state_ = STATE::NONE;
+
+	// 攻撃待機時間
+	attackCoolTime_ = 3.0f;
+
+	// アニメーション再開
+	animationController_->Play(
+		(int)ANIM_TYPE::IDLE,
+		true,
+		0.0f,
+		0.0f,
+		false,
+		true
+	);
+
+	transform_.Update();
+	targetPos_ = transform_.pos;
+	targetTimer_ = 0.0f;
+}
+
 void Enemy::AddCollider(Collider* collider)
 {
 	colliders_.push_back(collider);
@@ -155,9 +214,9 @@ void Enemy::InitAnimation(void)
 
 	std::string path = Application::PATH_MODEL + "Enemy/";
 	animationController_ = std::make_unique<AnimationController>(transform_.modelId);
-	animationController_->Add((int)ANIM_TYPE::IDLE, path + "Idle.mv1", 20.0f);
+	animationController_->Add((int)ANIM_TYPE::IDLE, path + "enemy_anim.mv1", 25.0f);
 	
-
+	animationController_->Play((int)ANIM_TYPE::IDLE, true);
 }
 
 void Enemy::UpdateNone(void)

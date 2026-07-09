@@ -89,6 +89,8 @@ public:
 
 	void SetPlayer(Player* player);
 
+	void Respawn(void);
+
 private:
 
 	STATE state_;
@@ -100,6 +102,9 @@ private:
 
 	// 攻撃クールタイム
 	float attackCoolTime_;
+
+	// 死亡後のタイマー
+	float deadTimer_;
 
 	VECTOR targetPos_;
 	float targetTimer_;

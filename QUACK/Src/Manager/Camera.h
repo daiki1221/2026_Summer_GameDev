@@ -67,6 +67,8 @@ public:
 	// ’Ç]‘ÎÛ‚Ìİ’è
 	void SetFollow(const Transform* follow);
 
+	void SetMouseControl(bool flag);
+
 private:
 
 	// ƒJƒƒ‰‚ª’Ç]‘ÎÛ‚Æ‚·‚éTransform
@@ -106,5 +108,6 @@ private:
 	void SetBeforeDrawFixedPoint(void);
 	void SetBeforeDrawFollow(void);
 	void SetBeforeDrawSelfShot(void);
-
+	bool isMouseControl_;
+	
 };

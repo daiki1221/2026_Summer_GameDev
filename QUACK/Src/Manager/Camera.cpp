@@ -238,12 +238,13 @@ void Camera::ProcessRot(void)
 	/*if (angles_.x > DX_PI_F / 5.0f) angles_.x = DX_PI_F / 5.0f;
 	if (angles_.x < -DX_PI_F / 5.0f) angles_.x = -DX_PI_F / 5.0f;*/
 
-
-	// --- マウスを常に中央に戻す ---
-	SetMousePoint(centerX, centerY);
-	prevMouseX = centerX;
-	prevMouseY = centerY;
-
+	if (!isMouseControl_)
+	{
+		// --- マウスを常に中央に戻す ---
+		SetMousePoint(centerX, centerY);
+		prevMouseX = centerX;
+		prevMouseY = centerY;
+	}
 
 }
 
@@ -265,4 +266,9 @@ void Camera::SetBeforeDrawFollow(void)
 
 void Camera::SetBeforeDrawSelfShot(void)
 {
+}
+
+void Camera::SetMouseControl(bool flag)
+{
+	isMouseControl_ = flag;
 }

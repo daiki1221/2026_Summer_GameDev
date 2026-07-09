@@ -78,7 +78,7 @@ private:
 	VECTOR scl_;
 	VECTOR scl;
 
-	static constexpr float SCALE = 100.0f;
+	static constexpr float SCALE = 50.0f;
 	static constexpr VECTOR SCALES = { SCALE,SCALE,SCALE };
 
 	// ç≈èâÇÃòfêØ
