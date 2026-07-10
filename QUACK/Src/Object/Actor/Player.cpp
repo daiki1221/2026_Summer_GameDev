@@ -194,13 +194,6 @@ void Player::Draw(void)
 			GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 
-	// HP表示
-	DrawFormatString(
-		20, 20,
-		GetColor(255, 255, 255),
-		"HP : %d",
-		hp_);
-
 	// モデルの描画
 	MV1DrawModel(transform_.modelId);
 	// 羽根パーティクルの描画
@@ -208,6 +201,8 @@ void Player::Draw(void)
 	{
 		feather.Draw();
 	}
+
+	DrawHPGauge();
 }
 
 void Player::AddCollider(Collider* collider)
@@ -817,6 +812,87 @@ void Player::Damage(int damage)
 bool Player::IsDead(void) const
 {
 	return hp_ <= 0;
+}
+
+void Player::DrawHPGauge() const
+{
+	const int maxHP = 150;  // 初期HPに合わせる
+
+	// 左下位置
+	int x = 50;
+	int y = Application::SCREEN_SIZE_Y - 70;
+
+	// ゲージサイズ
+	int width = 250;
+	int height = 25;
+
+	// HP割合
+	float rate = (float)hp_ / maxHP;
+
+	if (rate < 0.0f)
+	{
+		rate = 0.0f;
+	}
+
+	// HP色
+	int color;
+
+	if (rate > 0.5f)
+	{
+		color = GetColor(0, 255, 0); // 緑
+	}
+	else if (rate > 0.2f)
+	{
+		color = GetColor(255, 255, 0); // 黄
+	}
+	else
+	{
+		color = GetColor(255, 0, 0); // 赤
+	}
+
+
+	// 背景
+	DrawBox(
+		x,
+		y,
+		x + width,
+		y + height,
+		GetColor(50, 50, 50),
+		TRUE);
+
+
+	// 残りHP
+	DrawBox(
+		x,
+		y,
+		x + (int)(width * rate),
+		y + height,
+		color,
+		TRUE);
+
+
+	// 枠
+	DrawBox(
+		x,
+		y,
+		x + width,
+		y + height,
+		GetColor(255, 255, 255),
+		FALSE);
+
+
+	// 数値
+	SetFontSize(20);
+
+	DrawFormatString(
+		x,
+		y - 30,
+		GetColor(255, 255, 255),
+		"HP %d / %d",
+		hp_,
+		maxHP);
+
+	SetFontSize(16);
 }
 
 VECTOR Player::GetForward(void) const

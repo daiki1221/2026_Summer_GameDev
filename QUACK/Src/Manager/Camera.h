@@ -110,4 +110,6 @@ private:
 	void SetBeforeDrawSelfShot(void);
 	bool isMouseControl_;
 	
+	int prevMouseX_;
+	int prevMouseY_;
 };

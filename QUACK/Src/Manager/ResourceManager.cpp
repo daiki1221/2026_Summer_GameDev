@@ -71,6 +71,10 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "Feather.png");
 	resourcesMap_.emplace(SRC::FEATHER, res);
 
+	// BGM
+	res = new RES(RES_T::IMG, PATH_IMG + "GameBGM.mp3");
+	resourcesMap_.emplace(SRC::GAME_BGM, res);
+
 }
 
 void ResourceManager::Release(void)

@@ -21,6 +21,7 @@ public:
 		ECXL,
 		GUIDE,
 		FEATHER,
+		GAME_BGM,
 	};
 
 	// 明示的にインステンスを生成する

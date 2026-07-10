@@ -13,6 +13,7 @@
 #include "../Object/Actor/Bullet.h"
 #include "../Manager/ResourceManager.h"
 #include "GameScene.h"
+#include "PauseScene.h"
 
 GameScene::GameScene(void)
 {
@@ -22,6 +23,11 @@ GameScene::GameScene(void)
 
 GameScene::~GameScene(void)
 {
+	if (bgmHandle_ != -1)
+	{
+		StopSoundMem(bgmHandle_);
+		DeleteSoundMem(bgmHandle_);
+	}
 }
 
 void GameScene::Init(void)
@@ -83,78 +89,23 @@ void GameScene::Init(void)
 	imgNestMessage_ =
 		ResourceManager::GetInstance().Load(ResourceManager::SRC::GUIDE).handleId_;
 
-	isPause_ = false;
+	pauseScene_ = std::make_unique<PauseScene>();
+	pauseScene_->Init();
 
-	pauseSelect_ = PAUSE_SELECT::RESUME;
+	bgmHandle_ = -1;
+	bgmHandle_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_BGM).handleId_;
 
-	pauseMenuY_[0] = Application::SCREEN_SIZE_Y / 2;
-	pauseMenuY_[1] = Application::SCREEN_SIZE_Y / 2 + 60;
-	pauseMenuY_[2] = Application::SCREEN_SIZE_Y / 2 + 120;
+	PlaySoundMem(bgmHandle_, DX_PLAYTYPE_LOOP);
 }
 
 void GameScene::Update(void)
 {
 	auto const& ins = InputManager::GetInstance();
 
-	// ポーズ切り替え
-	if (ins.IsTrgDown(KEY_INPUT_TAB))
+	pauseScene_->Update();
+
+	if (pauseScene_->IsPause())
 	{
-		isPause_ = !isPause_;
-
-		SceneManager::GetInstance()
-			.GetCamera()
-			->SetMouseControl(isPause_);
-		SetMouseDispFlag(isPause_);
-	}
-
-	// ポーズ中
-	if (isPause_)
-	{
-
-		for (int i = 0; i < 3; i++)
-		{
-			if (IsMouseOnPauseMenu(i))
-			{
-				pauseSelect_ = (PAUSE_SELECT)i;
-			}
-		}
-
-		static int oldMouse = 0;
-
-		int mouse = GetMouseInput();
-
-		bool click =
-			(mouse & MOUSE_INPUT_LEFT) &&
-			!(oldMouse & MOUSE_INPUT_LEFT);
-
-		oldMouse = mouse;
-
-		if (click)
-		{
-			switch (pauseSelect_)
-			{
-
-			case PAUSE_SELECT::RESUME:
-
-				isPause_ = false;
-
-				break;
-
-
-			case PAUSE_SELECT::GUIDE:
-
-				// 操作説明シーンへ
-				break;
-
-
-			case PAUSE_SELECT::TITLE:
-
-				SceneManager::GetInstance()
-					.ChangeScene(
-						SceneManager::SCENE_ID::TITLE);
-				break;
-			}
-		}
 		return;
 	}
 
@@ -273,7 +224,6 @@ void GameScene::Draw(void)
 
 	player_->Draw();
 	
-
 	for (auto& duck : duckling_)
 	{
 		duck->Draw();
@@ -281,8 +231,90 @@ void GameScene::Draw(void)
 
 	// 残り時間を描画
 	int timeDisplay = static_cast<int>(time_);
-	DrawFormatString(50, 65, GetColor(255, 255, 255), "TIME: %d", timeDisplay);
+	int minutes = timeDisplay / 60;
+	int seconds = timeDisplay % 60;
 
+	SetFontSize(30);
+
+	// タイマー背景
+	DrawBox(
+		10,
+		10,
+		180,
+		70,
+		GetColor(0, 0, 0),
+		TRUE);
+
+	// 枠
+	DrawBox(
+		10,
+		7,
+		180,
+		70,
+		GetColor(255, 255, 255),
+		FALSE);
+
+	// 残り時間で色変更
+	int timerColor;
+
+	if (timeDisplay <= 30)
+	{
+		// 残り30秒は赤
+		timerColor = GetColor(255, 50, 50);
+	}
+	else
+	{
+		timerColor = GetColor(255, 255, 255);
+	}
+
+	// 時間表示
+	DrawFormatString(
+		20,
+		20,
+		GetColor(255, 255, 255),
+		"TIME: %03d",
+		timeDisplay
+	);
+
+	// 追従中のヒナをカウント
+	int followingCount = 0;
+
+	for (auto& duck : duckling_)
+	{
+		if (duck->IsFollowing())
+		{
+			followingCount++;
+		}
+	}
+
+	// ヒナの数の背景
+	DrawBox(
+		10,
+		80,
+		180,
+		120,
+		GetColor(0, 0, 0),
+		TRUE);
+
+	// 枠
+	DrawBox(
+		10,
+		80,
+		180,
+		120,
+		GetColor(255, 255, 255),
+		FALSE);
+
+	// ヒナの数表示
+	DrawFormatString(
+		20,
+		90,
+		GetColor(255, 255, 0),
+		"DUCK : %d / 3",
+		followingCount
+	);
+
+	SetFontSize(16);
 	// プレイヤー座標表示
 /*	VECTOR pos = player_->GetPos();
 
@@ -306,105 +338,8 @@ void GameScene::Draw(void)
 		"Pattern : %d",
 		pattern);*/
 
-	if (isPause_)
-	{
-		DrawPauseMenu();
-	}
+	pauseScene_->Draw();
+
 }
 
-void GameScene::DrawPauseMenu(void)
-{
-	SetDrawBlendMode(
-		DX_BLENDMODE_ALPHA,
-		160);
-
-	DrawBox(
-		0,
-		0,
-		Application::SCREEN_SIZE_X,
-		Application::SCREEN_SIZE_Y,
-		GetColor(0, 0, 0),
-		TRUE);
-
-	SetDrawBlendMode(
-		DX_BLENDMODE_NOBLEND,
-		0);
-
-	const char* menu[3] =
-	{
-		"ゲームへ戻る",
-		"操作説明",
-		"タイトルへ戻る"
-	};
-
-	int x = Application::SCREEN_SIZE_X / 2 - 150;
-
-	int mouseX;
-	int mouseY;
-
-	GetMousePoint(&mouseX, &mouseY);
-
-	for (int i = 0; i < 3; i++)
-	{
-		int y = pauseMenuY_[i];
-
-		bool hover =
-			IsMouseOnPauseMenu(i);
-
-		int color;
-
-		if (hover || (int)pauseSelect_ == i)
-		{
-			color = GetColor(255, 200, 0);
-		}
-		else
-		{
-			color = GetColor(100, 100, 100);
-		}
-
-		DrawBox(
-			x,
-			y,
-			x + 300,
-			y + 45,
-			color,
-			TRUE);
-
-		DrawBox(
-			x,
-			y,
-			x + 300,
-			y + 45,
-			GetColor(255, 255, 255),
-			FALSE);
-
-		DrawFormatString(
-			x + 80,
-			y + 12,
-			GetColor(255, 255, 255),
-			menu[i]);
-	}
-}
-
-bool GameScene::IsMouseOnPauseMenu(int index)
-{
-
-	int mx;
-	int my;
-
-	GetMousePoint(&mx, &my);
-
-
-	int x = Application::SCREEN_SIZE_X / 2 - 150;
-	int y = pauseMenuY_[index];
-
-
-	return
-		(
-			mx >= x &&
-			mx <= x + 300 &&
-			my >= y &&
-			my <= y + 45
-			);
-}
 

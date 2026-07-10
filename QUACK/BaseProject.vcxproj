@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Scene\PauseScene.cpp" />
     <ClCompile Include="Src\Object\Actor\FeatherParticle.cpp" />
     <ClCompile Include="Src\Scene\MenuScene.cpp" />
     <ClCompile Include="Src\Object\Actor\Bullet.cpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="Src\Object\Common\Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Scene\PauseScene.h" />
     <ClInclude Include="Src\Object\Actor\FeatherParticle.h" />
     <ClInclude Include="Src\Scene\MenuScene.h" />
     <ClInclude Include="Src\Object\Actor\Bullet.h" />

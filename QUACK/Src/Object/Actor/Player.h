@@ -90,6 +90,8 @@ public:
 	void Damage(int damage);
 	bool IsDead(void) const;
 
+	void DrawHPGauge() const;
+
 private:
 	// アニメーション制御
 	std::unique_ptr<AnimationController> animationController_;

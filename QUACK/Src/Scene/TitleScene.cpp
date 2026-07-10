@@ -67,6 +67,7 @@ void TitleScene::Update(void)
 		case SELECT::GUIDE:
 
 			// 操作説明シーンへ
+			sceMng_.OpenMenu();
 
 			break;
 
@@ -126,7 +127,7 @@ void TitleScene::Update(void)
 		case SELECT::GUIDE:
 
 			// 操作説明シーンへ
-			// sceMng_.ChangeScene(SceneManager::SCENE_ID::HOWTO);
+			sceMng_.OpenMenu();
 
 			break;
 

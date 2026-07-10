@@ -8,6 +8,7 @@ class Player;
 class Duckling;
 class Enemy;
 class Bullet;
+class PauseScene;
 
 class GameScene : public SceneBase
 {
@@ -44,6 +45,8 @@ private:
 
 	std::vector<std::shared_ptr<Bullet>> bullet_;
 
+	std::unique_ptr<PauseScene> pauseScene_;
+
 	float time_; //Žc‚èŽžŠÔ
 
 	int pattern;
@@ -73,20 +76,7 @@ private:
 	
 	int imgNestMessage_;
 
-	bool isPause_;
+	int bgmHandle_;
 
-	enum class PAUSE_SELECT
-	{
-		RESUME,
-		GUIDE,
-		TITLE,
-	};
-
-	PAUSE_SELECT pauseSelect_;
-
-	int pauseMenuY_[3];
-
-	void DrawPauseMenu(void);
-
-	bool IsMouseOnPauseMenu(int index);
+	
 };

@@ -14,6 +14,8 @@ Camera::Camera(void)
 	pos_ = AsoUtility::VECTOR_ZERO;
 	targetPos_ = AsoUtility::VECTOR_ZERO;
 	followTransform_ = nullptr;
+	prevMouseX_ = -1;
+	prevMouseY_ = -1;
 }
 
 Camera::~Camera(void)
@@ -24,7 +26,15 @@ void Camera::Init(void)
 {
 
 	ChangeMode(MODE::FIXED_POINT);
+	int w, h;
 
+	GetScreenState(
+		&w,
+		&h,
+		nullptr);
+
+	prevMouseX_ = w / 2;
+	prevMouseY_ = h / 2;
 }
 
 void Camera::Update(void)
@@ -206,6 +216,9 @@ void Camera::ProcessRot(void)
 		}
 	}
 
+	if (!isMouseControl_)
+	{
+
 	int mouseX, mouseY;
 	GetMousePoint(&mouseX, &mouseY);
 
@@ -214,20 +227,21 @@ void Camera::ProcessRot(void)
 	int centerX = screenW / 2;
 	int centerY = screenH / 2;
 
-	static bool first = true;
-	static int prevMouseX = centerX;
-	static int prevMouseY = centerY;
-
-	if (first) {
+	if (prevMouseX_ == -1)
+	{
 		SetMousePoint(centerX, centerY);
-		first = false;
+
+		prevMouseX_ = centerX;
+		prevMouseY_ = centerY;
+
+		return;
 	}
 
-	int deltaX = mouseX - prevMouseX;
-	int deltaY = mouseY - prevMouseY;
+	int deltaX = mouseX - prevMouseX_;
+	int deltaY = mouseY - prevMouseY_;
 
-	prevMouseX = mouseX;
-	prevMouseY = mouseY;
+	prevMouseX_ = mouseX;
+	prevMouseY_ = mouseY;
 
 	// --- マウス感度調整 ---
 	float mouseSensitivity = 0.005f;
@@ -238,12 +252,10 @@ void Camera::ProcessRot(void)
 	/*if (angles_.x > DX_PI_F / 5.0f) angles_.x = DX_PI_F / 5.0f;
 	if (angles_.x < -DX_PI_F / 5.0f) angles_.x = -DX_PI_F / 5.0f;*/
 
-	if (!isMouseControl_)
-	{
 		// --- マウスを常に中央に戻す ---
 		SetMousePoint(centerX, centerY);
-		prevMouseX = centerX;
-		prevMouseY = centerY;
+		prevMouseX_ = centerX;
+		prevMouseY_ = centerY;
 	}
 
 }
@@ -271,4 +283,21 @@ void Camera::SetBeforeDrawSelfShot(void)
 void Camera::SetMouseControl(bool flag)
 {
 	isMouseControl_ = flag;
+
+	int screenW;
+	int screenH;
+
+	GetScreenState(
+		&screenW,
+		&screenH,
+		nullptr);
+
+
+	prevMouseX_ = screenW / 2;
+	prevMouseY_ = screenH / 2;
+
+
+	SetMousePoint(
+		screenW / 2,
+		screenH / 2);
 }
