@@ -20,6 +20,7 @@ Transform::Transform(void)
 	collider_ = nullptr;
 }
 
+
 Transform::Transform(int model)
 {
 	modelId = model;

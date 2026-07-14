@@ -90,6 +90,7 @@ public:
 	void Damage(int damage);
 	bool IsDead(void) const;
 
+	// HPƒQ[ƒW‚Ì•`‰æ
 	void DrawHPGauge() const;
 
 private:
