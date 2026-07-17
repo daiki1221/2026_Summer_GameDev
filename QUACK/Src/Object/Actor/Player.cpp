@@ -801,8 +801,8 @@ void Player::Damage(int damage)
 		VECTOR pos = transform_.pos;
 		pos.y += 30.0f;
 		// ÉâÉìÉ_ÉÄÇ…è≠ÇµÇ∏ÇÁÇ∑
-		pos.x += (rand() % 40 - 20) * 0.1f;
-		pos.z += (rand() % 40 - 20) * 0.1f;
+		pos.x += (rand() % 200 - 100) * 0.1f;
+		pos.z += (rand() % 200 - 100) * 0.1f;
 
 		f.Init(pos);
 		feathers_.push_back(f);

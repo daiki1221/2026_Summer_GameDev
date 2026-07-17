@@ -12,6 +12,8 @@
 #include "../Common/Collider.h"
 #include "Planet.h"
 #include "Player.h"
+#include "../../Manager/EffectManager.h"
+#include "../Effect/WindEffect.h"
 #include "Enemy.h"
 
 Enemy::Enemy(void)
@@ -194,6 +196,11 @@ void Enemy::Respawn(void)
 	targetTimer_ = 0.0f;
 }
 
+void Enemy::SetEffectManager(EffectManager* effectMng)
+{
+	effectMng_ = effectMng;
+}
+
 void Enemy::AddCollider(Collider* collider)
 {
 	colliders_.push_back(collider);
@@ -286,6 +293,35 @@ void Enemy::UpdatePlay(void)
 	{
 		speed_ = 10.0f;
 		movePow_ = VScale(moveDir_, speed_);
+
+		// ìÀêiíÜÇÃïó
+		windTimer_ -= scnMng_.GetDeltaTime();
+
+		if (windTimer_ <= 0.0f)
+		{
+			windTimer_ = 0.05f;
+
+			float angle = (float)(rand() % 360) * DX_PI_F / 180.0f;
+			float radius = 50.0f + rand() % 80;
+
+			VECTOR offset = VGet(
+				cosf(angle) * radius,
+				(float)(rand() % 100),
+				sinf(angle) * radius
+			);
+
+			VECTOR windPos =
+				VAdd(transform_.pos, offset);
+
+			// å„ÇÎÇ…ó¨ÇÍÇÈïó
+			VECTOR windDir =
+				VScale(moveDir_, -1.0f);
+
+			effectMng_->Add(
+				std::make_unique<WindEffect>(
+					windPos,
+					windDir));
+		}
 
 		chargeTimer_ -= scnMng_.GetDeltaTime();
 

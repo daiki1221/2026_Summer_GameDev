@@ -14,7 +14,6 @@
 #include "Player.h"
 #include "Duckling.h"
 
-
 Duckling::Duckling(void)
 {
 
@@ -378,7 +377,19 @@ void Duckling::ProcessMove(void)
 	{
 		VECTOR dir = VNorm(toTarget);
 
-		speed_ = 3.0f;
+		// 距離によって速度変更
+		if (dist > 300.0f)
+		{
+			speed_ = 14.0f;      // かなり離れたらダッシュ
+		}
+		else if (dist > 150.0f)
+		{
+			speed_ = 10.0f;      // 少し離れたら速め
+		}
+		else
+		{
+			speed_ = 3.0f;      // 普段の速度
+		}
 
 		movePow_ = VScale(dir, speed_);
 

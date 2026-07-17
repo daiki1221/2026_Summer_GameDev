@@ -9,6 +9,7 @@ class Duckling;
 class Enemy;
 class Bullet;
 class PauseScene;
+class EffectManager;
 
 class GameScene : public SceneBase
 {
@@ -47,6 +48,8 @@ private:
 
 	std::unique_ptr<PauseScene> pauseScene_;
 
+	std::unique_ptr<EffectManager> effectMng_;
+
 	float time_; //Žc‚èŽžŠÔ
 
 	int pattern;
@@ -61,7 +64,7 @@ private:
 		{
 			{   76,  34, 2155},
 			{-3743,-186, 3952},
-			{  960,-106,-3536}
+			{  900,-106,-3536}
 		},
 		{
 			{   76, 34, 2155},
@@ -75,6 +78,7 @@ private:
 	float nestMessageTimer_;
 	
 	int imgNestMessage_;
+	int imgDuckling_;
 
 	int bgmHandle_;
 

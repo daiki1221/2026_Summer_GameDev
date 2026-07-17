@@ -75,7 +75,16 @@ void Stage::Update(void)
 		s.second->Update();
 	}
 
+	skyRotY_ += 0.0005f;
+
+	MV1SetRotationXYZ(
+		skyTrans_.modelId,
+		VGet(0.0f, skyRotY_, 0.0f)
+	);
+
 	MV1DrawModel(skyTrans_.modelId);
+
+
 }
 
 void Stage::Draw(void)

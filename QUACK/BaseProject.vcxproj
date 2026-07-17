@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Object\Effect\Effect.cpp" />
+    <ClCompile Include="Src\Manager\EffectManager.cpp" />
     <ClCompile Include="Src\Scene\PauseScene.cpp" />
     <ClCompile Include="Src\Object\Actor\FeatherParticle.cpp" />
     <ClCompile Include="Src\Scene\MenuScene.cpp" />
@@ -50,8 +52,11 @@
     <ClCompile Include="Src\Utility\AsoUtility.cpp" />
     <ClCompile Include="Src\Utility\MatrixUtility.cpp" />
     <ClCompile Include="Src\Object\Common\Stage.cpp" />
+    <ClCompile Include="Src\Object\Effect\WindEffect.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Object\Effect\Effect.h" />
+    <ClInclude Include="Src\Manager\EffectManager.h" />
     <ClInclude Include="Src\Scene\PauseScene.h" />
     <ClInclude Include="Src\Object\Actor\FeatherParticle.h" />
     <ClInclude Include="Src\Scene\MenuScene.h" />
@@ -83,6 +88,7 @@
     <ClInclude Include="Src\Utility\AsoUtility.h" />
     <ClInclude Include="Src\Utility\MatrixUtility.h" />
     <ClInclude Include="Src\Object\Common\Stage.h" />
+    <ClInclude Include="Src\Object\Effect\WindEffect.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

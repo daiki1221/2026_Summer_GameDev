@@ -19,9 +19,9 @@ void FeatherParticle::Init(const VECTOR& pos)
     pos_ = pos;
 
     vel_ = VGet(
-        (rand() % 200 - 100) * 0.005f,
+        (rand() % 200 - 100) * 0.01f,
         (rand() % 50) * 0.002f,
-        (rand() % 200 - 100) * 0.005f
+        (rand() % 200 - 100) * 0.01f
     );
 
     rotSpeed_ = (rand() % 200 - 100) * 0.004f;

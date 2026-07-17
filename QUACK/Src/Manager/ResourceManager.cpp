@@ -21,8 +21,6 @@ ResourceManager& ResourceManager::GetInstance(void)
 
 void ResourceManager::Init(void)
 {
-
-	// 推奨しませんが、どうしても使いたい方は
 	using RES = Resource;
 	using RES_T = RES::TYPE;
 	static std::string PATH_IMG = Application::PATH_IMAGE;
@@ -39,35 +37,35 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "Shadow.png");
 	resourcesMap_.emplace(SRC::PLAYER_SHADOW, res);
 
-		// メイン惑星
-	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage2.mv1");
+	// メイン惑星
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage.mv1");
 	resourcesMap_.emplace(SRC::MAIN_PLANET, res);
 
-	// ひな
+	// ひなモデル
 	res = new RES(RES_T::MODEL, PATH_MDL + "Player/duckling.mv1");
 	resourcesMap_.emplace(SRC::DUCKLING, res);
 
-	// 巣
+	// 巣モデル
 	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/nest.mv1");
 	resourcesMap_.emplace(SRC::NEST, res);
 
-	// 空ドーム
+	// 空
 	res = new RES(RES_T::MODEL, PATH_MDL + "SkyDome/SkyDome.mv1");
 	resourcesMap_.emplace(SRC::SKY_DOME, res);
 
-	// 敵
+	// 敵モデル
 	res = new RES(RES_T::MODEL, PATH_MDL + "Enemy/enemy.mv1");
 	resourcesMap_.emplace(SRC::ENEMY, res);
 
-	//!
+	//!マーク
 	res = new RES(RES_T::IMG, PATH_IMG + "Exclamation.png");
 	resourcesMap_.emplace(SRC::ECXL, res);
 
-	// 巣を目指すメッセージ
+	// 巣を目指せメッセージ
 	res = new RES(RES_T::IMG, PATH_IMG + "NestGuide.png");
 	resourcesMap_.emplace(SRC::GUIDE, res);
 
-	// 羽根
+	// ダメージ時の羽
 	res = new RES(RES_T::IMG, PATH_IMG + "Feather.png");
 	resourcesMap_.emplace(SRC::FEATHER, res);
 
@@ -75,6 +73,9 @@ void ResourceManager::Init(void)
 	res = new RES(RES_T::IMG, PATH_IMG + "GameBGM.mp3");
 	resourcesMap_.emplace(SRC::GAME_BGM, res);
 
+	// ひなアイコン
+	res = new RES(RES_T::IMG, PATH_IMG + "DucklingIcon.png");
+	resourcesMap_.emplace(SRC::DUCKLING_IMG, res);
 }
 
 void ResourceManager::Release(void)

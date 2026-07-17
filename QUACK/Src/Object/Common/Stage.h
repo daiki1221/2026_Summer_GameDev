@@ -78,7 +78,7 @@ private:
 	VECTOR scl_;
 	VECTOR scl;
 
-	static constexpr float SCALE = 50.0f;
+	static constexpr float SCALE = 70.0f;
 	static constexpr VECTOR SCALES = { SCALE,SCALE,SCALE };
 
 	// ç≈èâÇÃòfêØ
@@ -87,4 +87,6 @@ private:
 
 	Transform nestTrans_;
 	Transform skyTrans_;
+
+	float skyRotY_ = 0.0f;
 };

@@ -6,6 +6,8 @@ class AnimationController;
 class Collider;
 class Capsule;
 class Player;
+class EffectManager;
+class WindEffect;
 
 class Enemy : public ActorBase
 {
@@ -39,6 +41,7 @@ public:
 	float hitColorTimer_;
 	bool isHit_;
 	int color;
+	int windTimer_;
 
 	// アニメーション種別
 	enum class ANIM_TYPE
@@ -91,7 +94,13 @@ public:
 
 	void Respawn(void);
 
+	void SetEffectManager(EffectManager* effectMng);
+
 private:
+
+	EffectManager* effectMng_;
+
+	std::unique_ptr<WindEffect> windEffect_;
 
 	STATE state_;
 

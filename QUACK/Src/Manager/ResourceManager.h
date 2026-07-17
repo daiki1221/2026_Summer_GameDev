@@ -22,6 +22,7 @@ public:
 		GUIDE,
 		FEATHER,
 		GAME_BGM,
+		DUCKLING_IMG
 	};
 
 	// 明示的にインステンスを生成する

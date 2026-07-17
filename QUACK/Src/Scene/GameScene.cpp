@@ -12,6 +12,7 @@
 #include "../Object/Actor/Enemy.h"
 #include "../Object/Actor/Bullet.h"
 #include "../Manager/ResourceManager.h"
+#include "../Manager/EffectManager.h"
 #include "GameScene.h"
 #include "PauseScene.h"
 
@@ -23,6 +24,9 @@ GameScene::GameScene(void)
 
 GameScene::~GameScene(void)
 {
+	// マウスカーソルを再表示
+	SetMouseDispFlag(TRUE);
+
 	if (bgmHandle_ != -1)
 	{
 		StopSoundMem(bgmHandle_);
@@ -32,15 +36,26 @@ GameScene::~GameScene(void)
 
 void GameScene::Init(void)
 {
+	// マウスカーソルを非表示
+	SetMouseDispFlag(FALSE);
+
+	// 以下、既存処理
+	pattern = rand() % patterns.size();
+
 	// 乱数の初期化
 	pattern = rand() % patterns.size();
 
 	// プレイヤーの生成と初期化
 	player_ = std::make_shared<Player>();
 	player_->Init();
+
+	// エフェクトマネージャの生成
+	effectMng_ = std::make_unique<EffectManager>();
 	// 敵の生成と初期化
 	enemy_ = std::make_unique<Enemy>();
+	enemy_->SetEffectManager(effectMng_.get());
 	enemy_->Init();
+
 	// プレイヤーに敵を設定
 	player_->SetEnemy(enemy_.get());
 	enemy_->SetPlayer(player_.get());
@@ -95,6 +110,10 @@ void GameScene::Init(void)
 	bgmHandle_ = -1;
 	bgmHandle_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::GAME_BGM).handleId_;
 
+	imgDuckling_ = -1;
+	imgDuckling_ =
+		ResourceManager::GetInstance().Load(ResourceManager::SRC::DUCKLING_IMG).handleId_;
+
 	PlaySoundMem(bgmHandle_, DX_PLAYTYPE_LOOP);
 }
 
@@ -123,6 +142,8 @@ void GameScene::Update(void)
 	player_->Update();
 	
 	enemy_->Update();
+
+	effectMng_->Update(SceneManager::GetInstance().GetDeltaTime());
 
 	for (auto& duck : duckling_)
 	{
@@ -210,7 +231,6 @@ void GameScene::Update(void)
 		}
 	}
 
-	
 
 }
 
@@ -221,6 +241,7 @@ void GameScene::Draw(void)
 	stage_->Draw();
 
 	enemy_->Draw();
+	effectMng_->Draw();
 
 	player_->Draw();
 	
@@ -305,6 +326,8 @@ void GameScene::Draw(void)
 		GetColor(255, 255, 255),
 		FALSE);
 
+	SetFontSize(16);
+
 	// ヒナの数表示
 	DrawFormatString(
 		20,
@@ -314,7 +337,7 @@ void GameScene::Draw(void)
 		followingCount
 	);
 
-	SetFontSize(16);
+	
 	// プレイヤー座標表示
 /*	VECTOR pos = player_->GetPos();
 
@@ -327,7 +350,7 @@ void GameScene::Draw(void)
 	if (isNestMessage_)
 	{
 		DrawGraph(
-			Application::SCREEN_SIZE_X /4,
+			Application::SCREEN_SIZE_X/2,
 			10,
 			imgNestMessage_,
 			TRUE);
