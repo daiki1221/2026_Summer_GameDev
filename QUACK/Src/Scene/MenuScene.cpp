@@ -32,8 +32,8 @@ void MenuScene::Update(void)
     int mouseX, mouseY;
     GetMousePoint(&mouseX, &mouseY);
 
-    // spaceでメニューを閉じる
-    if (inputManager_->IsTrgDown(KEY_INPUT_SPACE))
+    if (inputManager_->IsTrgDown(KEY_INPUT_SPACE) ||
+        (GetMouseInput() & MOUSE_INPUT_LEFT))
     {
         sceneManager_->ReturnPrevScene(); // 元のシーンに戻す
     }

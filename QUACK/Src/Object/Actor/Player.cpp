@@ -886,13 +886,13 @@ void Player::DrawHPGauge() const
 	// êîíl
 	SetFontSize(20);
 
-	DrawFormatString(
+	/*DrawFormatString(
 		x,
 		y - 30,
 		GetColor(255, 255, 255),
 		"HP %d / %d",
 		hp_,
-		maxHP);
+		maxHP);*/
 
 	SetFontSize(16);
 }

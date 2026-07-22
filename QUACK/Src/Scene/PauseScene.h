@@ -3,6 +3,7 @@
 #include <vector>
 #include "SceneBase.h"
 #include "ResultScene.h"
+#include "../Common/Fader.h"
 
 class PauseScene : public SceneBase
 {
@@ -49,5 +50,6 @@ private:
 
 	bool isGuide_;
 	int guideImage_;
+	Fader* fade_;
 
 };
