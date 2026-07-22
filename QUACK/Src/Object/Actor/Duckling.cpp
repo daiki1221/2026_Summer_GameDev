@@ -44,6 +44,8 @@ Duckling::Duckling(void)
 	isFollowing_ = false;
 	foundTimer_ = 0.0f;
 
+	isNestWait_ = false;
+
 }
 
 Duckling::~Duckling(void)
@@ -301,6 +303,12 @@ void Duckling::SetFollowIndex(int index)
 
 void Duckling::ProcessMove(void)
 {
+	if (isNestWait_)
+	{
+		movePow_ = AsoUtility::VECTOR_ZERO;
+		return;
+	}
+
 	if (player_ == nullptr)
 	{
 		return;
@@ -668,6 +676,12 @@ bool Duckling::IsFoundPlayer(void) const
 	return isFoundPlayer_;
 }
 
+void Duckling::WaitNest(const VECTOR& nestPos)
+{
+	isNestWait_ = true;
+	isFollowing_ = false;
 
+	transform_.pos = nestPos;
+}
 
 

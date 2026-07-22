@@ -41,4 +41,8 @@ private:
 	void DrawMenu(void);
 
 	bool IsMouseOnMenu(int index);
+
+	int startImg_;
+	int guideImg_;
+	int endImg_;
 };

@@ -38,7 +38,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::PLAYER_SHADOW, res);
 
 	// メイン惑星
-	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage.mv1");
+	res = new RES(RES_T::MODEL, PATH_MDL + "Stage/stage2.mv1");
 	resourcesMap_.emplace(SRC::MAIN_PLANET, res);
 
 	// ひなモデル
@@ -74,7 +74,7 @@ void ResourceManager::Init(void)
 	resourcesMap_.emplace(SRC::GAME_BGM, res);
 
 	// ひなアイコン
-	res = new RES(RES_T::IMG, PATH_IMG + "DucklingIcon.png");
+	res = new RES(RES_T::IMG, PATH_IMG + "Duckling.png");
 	resourcesMap_.emplace(SRC::DUCKLING_IMG, res);
 }
 

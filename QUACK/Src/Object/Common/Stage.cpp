@@ -62,8 +62,11 @@ void Stage::Init(void)
 	scl_ = SCALES;
 	pos1_ = AsoUtility::VECTOR_ZERO;
 
+	nestPos_ = { -100.0f, -120.0f, 300.0f };
+
 	MV1SetScale(skyTrans_.modelId, scl_);
 	MV1SetPosition(skyTrans_.modelId, pos1_);
+	MV1SetPosition(nestTrans_.modelId, nestPos_);
 
 }
 
@@ -130,6 +133,22 @@ Planet* Stage::GetPlanet(NAME type)
 	}
 
 	return planets_[type];
+}
+
+void Stage::SendDucklingNest()
+{
+	for (auto& duck : duckling_)
+	{
+		if (!duck.expired())
+		{
+			duck.lock()->WaitNest(GetNestPos());
+		}
+	}
+}
+
+VECTOR Stage::GetNestPos() const
+{
+	return MV1GetPosition(nestTrans_.modelId);
 }
 
 void Stage::MakeMainStage(void)

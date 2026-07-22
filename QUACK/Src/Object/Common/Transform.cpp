@@ -99,7 +99,7 @@ void Transform::MakeCollider(Collider::TYPE type)
 	}
 
 	collider_ = new Collider(type, modelId);
-	int ret = MV1SetupCollInfo(modelId, -1, 1, 1, 1);
+	int ret = MV1SetupCollInfo(modelId, -1, 8, 8, 8);
 
 }
 

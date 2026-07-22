@@ -51,6 +51,10 @@ public:
 	// 対象ステージを取得
 	Planet* GetPlanet(NAME type);
 
+	void SendDucklingNest();
+
+	VECTOR GetNestPos() const;
+
 private:
 
 	// シングルトン参照
@@ -89,4 +93,6 @@ private:
 	Transform skyTrans_;
 
 	float skyRotY_ = 0.0f;
+
+	VECTOR nestPos_;
 };

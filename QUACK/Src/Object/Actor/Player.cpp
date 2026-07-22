@@ -69,9 +69,9 @@ void Player::Init(void)
 
 	// カプセルコライダ
 	capsule_ = std::make_unique<Capsule>(transform_);
-	capsule_->SetLocalPosTop({ 0.0f, 110.0f, 0.0f });
+	capsule_->SetLocalPosTop({ 0.0f, 40.0f, 0.0f });
 	capsule_->SetLocalPosDown({ 0.0f, 30.0f, 0.0f });
-	capsule_->SetRadius(20.0f);
+	capsule_->SetRadius(15.0f);
 
 	// 丸影画像
 	imgShadow_ = resMng_.Load(ResourceManager::SRC::PLAYER_SHADOW).handleId_;
@@ -154,6 +154,8 @@ void Player::Update(void)
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::RESULT);
 	}
 
+
+
 }
 
 void Player::Draw(void)
@@ -203,6 +205,7 @@ void Player::Draw(void)
 	}
 
 	DrawHPGauge();
+
 }
 
 void Player::AddCollider(Collider* collider)
@@ -616,7 +619,7 @@ void Player::CollisionGravity(void)
 	// 重力の強さ
 	float gravityPow = Planet::DEFAULT_GRAVITY_POW;
 
-	float checkPow = 10.0f;
+	float checkPow = 41.0f;
 	gravHitPosUp_ = VAdd(movedPos_, VScale(dirUpGravity, gravityPow));
 	gravHitPosUp_ = VAdd(gravHitPosUp_, VScale(dirUpGravity, checkPow * 2.0f));
 	gravHitPosDown_ = VAdd(movedPos_, VScale(dirGravity, checkPow));
@@ -676,7 +679,6 @@ void Player::CollisionCapsule(void)
 		// カプセルとの衝突判定
 		for (const auto c : colliders_)
 		{
-
 			auto hits = MV1CollCheck_Capsule(
 				c->modelId_, -1,
 				cap.GetPosTop(), cap.GetPosDown(), cap.GetRadius());
@@ -695,7 +697,7 @@ void Player::CollisionCapsule(void)
 
 					if (pHit)
 					{
-						movedPos_ = VAdd(movedPos_, VScale(hit.Normal, 0.1f));
+						movedPos_ = VAdd(movedPos_, VScale(hit.Normal, 2.0f));
 						// カプセルを移動させる
 						trans.pos = movedPos_;
 						trans.Update();

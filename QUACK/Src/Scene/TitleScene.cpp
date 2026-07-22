@@ -21,13 +21,18 @@ void TitleScene::Init(void)
 	
 	sceMng_.GetCamera()->ChangeMode(Camera::MODE::FIXED_POINT);
 
-	image_ = LoadGraph("Data/Image/Title.png");
+	image_ = LoadGraph("Data/Image/Title/Title.png");
 
 	select_ = SELECT::START;
 
-	menuY_[0] = Application::SCREEN_SIZE_Y / 2;
+	menuY_[0] = Application::SCREEN_SIZE_Y / 2-40;
 	menuY_[1] = Application::SCREEN_SIZE_Y / 2 + 60;
-	menuY_[2] = Application::SCREEN_SIZE_Y / 2 + 120;
+	menuY_[2] = Application::SCREEN_SIZE_Y / 2 + 160;
+
+	startImg_ = LoadGraph("Data/Image/Title/Start.png");
+	guideImg_ = LoadGraph("Data/Image/Title/Guide.png");
+	endImg_ = LoadGraph("Data/Image/Title/End.png");
+
 }
 
 void TitleScene::Update(void)
@@ -153,12 +158,6 @@ void TitleScene::Draw(void)
 
 void TitleScene::DrawMenu(void)
 {
-	const char* menu[3] =
-	{
-		"ゲームスタート",
-		"操作説明",
-		"ゲームをおわる"
-	};
 
 
 	int mouseX;
@@ -170,11 +169,11 @@ void TitleScene::DrawMenu(void)
 	for (int i = 0; i < 3; i++)
 	{
 
-		int x = Application::SCREEN_SIZE_X / 2 - 150;
+		int x = Application::SCREEN_SIZE_X / 2 - 190;
 		int y = menuY_[i];
 
-		int w = 300;
-		int h = 45;
+		int w = 350;
+		int h = 85;
 
 
 		bool mouseOn =
@@ -201,69 +200,43 @@ void TitleScene::DrawMenu(void)
 			boxColor = GetColor(80, 80, 80);
 		}
 
+		// ボタン
+		DrawGraph(
+			x + 10,
+			y + 5,
+			(i == 0) ? startImg_ : (i == 1) ? guideImg_ : endImg_,
+			true);
 
-		// ボタン背景
-		DrawBox(
-			x,
-			y,
-			x + w,
-			y + h,
-			boxColor,
+		float scale = (selected || mouseOn) ? 1.1f : 1.0f;
+
+		DrawRotaGraph(
+			x + 185,
+			y + 45,
+			scale,
+			0.0,
+			(i == 0) ? startImg_ :
+			(i == 1) ? guideImg_ :
+			endImg_,
 			TRUE);
 
-
-		// 枠
-		DrawBox(
-			x,
-			y,
-			x + w,
-			y + h,
-			GetColor(255, 255, 255),
-			FALSE);
-
-
-		// 文字
-		int textColor;
-
-		if (mouseOn || selected)
-		{
-			textColor = GetColor(255, 255, 255);
-		}
-		else
-		{
-			textColor = GetColor(200, 200, 200);
-		}
-
-
-		DrawFormatString(
-			x + 80,
-			y + 12,
-			textColor,
-			menu[i]);
 	}
 }
 
 bool TitleScene::IsMouseOnMenu(int index)
 {
-	int mouseX;
-	int mouseY;
-
+	int mouseX, mouseY;
 	GetMousePoint(&mouseX, &mouseY);
 
+	int x = Application::SCREEN_SIZE_X / 2 - 190 + 10;
+	int y = menuY_[index] + 5;
 
-	int x = Application::SCREEN_SIZE_X / 2 - 100;
-	int y = menuY_[index];
+	int w, h;
+	GetGraphSize(startImg_, &w, &h);
 
+	return (mouseX >= x &&
+		mouseX <= x + w &&
+		mouseY >= y &&
+		mouseY <= y + h);
 
-	if (mouseX >= x &&
-		mouseX <= x + 250 &&
-		mouseY >= y - 10 &&
-		mouseY <= y + 40)
-	{
-		return true;
-	}
-
-
-	return false;
 }
 

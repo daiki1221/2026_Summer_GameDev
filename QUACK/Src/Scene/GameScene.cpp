@@ -150,7 +150,7 @@ void GameScene::Update(void)
 		duck->Update();
 	}
 
-	VECTOR nestPos = { -100.0f, -100.0f, 300.0f };
+	VECTOR nestPos = stage_->GetNestPos();
 	const float NEST_RADIUS = 100.0f;           // 判定用半径
 	int reachCount = 0;
 
@@ -216,27 +216,47 @@ void GameScene::Update(void)
 		}
 	}
 
+	float dist = VSize(VSub(player_->GetPos(), nestPos));
+
 	if (ins.IsTrgDown(KEY_INPUT_F))
 	{
-		for (auto& duck : duckling_)
+		// 3匹連れていて、巣の近くなら預ける
+		if (followingCount == 3 && dist < 150.0f)
 		{
-			if (duck->IsFollowing())
-				continue;
+			DrawString(
+				500,
+				650,
+				"F : ひなを巣に運ぶ",
+				GetColor(255, 255, 255));
+			for (auto& duck : duckling_)
+			{
+				if (duck->IsFollowing())
+				{
+					duck->WaitNest(nestPos);
+				}
+			}
+		}
+		// それ以外はヒナを助ける
+		else
+		{
+			for (auto& duck : duckling_)
+			{
+				if (duck->IsFollowing())
+					continue;
 
-			if (!duck->IsFoundPlayer())
-				continue;
+				if (!duck->IsFoundPlayer())
+					continue;
 
-			duck->StartFollowing();
-			break;
+				duck->StartFollowing();
+				break;
+			}
 		}
 	}
-
-
 }
 
 void GameScene::Draw(void)
 {
-
+	
 	// ステージの描画
 	stage_->Draw();
 
@@ -313,7 +333,7 @@ void GameScene::Draw(void)
 		10,
 		80,
 		180,
-		120,
+		130,
 		GetColor(0, 0, 0),
 		TRUE);
 
@@ -322,21 +342,24 @@ void GameScene::Draw(void)
 		10,
 		80,
 		180,
-		120,
+		130,
 		GetColor(255, 255, 255),
 		FALSE);
 
-	SetFontSize(16);
 
-	// ヒナの数表示
+	// DUCK画像
+	DrawGraph(20, 85, imgDuckling_, TRUE);
+
+	// 数字
 	DrawFormatString(
-		20,
+		80,      // 画像の右側
 		90,
 		GetColor(255, 255, 0),
-		"DUCK : %d / 3",
+		": %d/3",
 		followingCount
 	);
 
+	SetFontSize(16);
 	
 	// プレイヤー座標表示
 /*	VECTOR pos = player_->GetPos();
@@ -362,6 +385,8 @@ void GameScene::Draw(void)
 		pattern);*/
 
 	pauseScene_->Draw();
+
+
 
 }
 

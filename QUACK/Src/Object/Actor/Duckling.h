@@ -70,6 +70,7 @@ class Duckling : public ActorBase
 	void StartFollowing(void);
 	bool IsFoundPlayer(void) const;
 
+	void WaitNest(const VECTOR& nestPos);
 
 private:
 	// アニメーション制御
@@ -151,6 +152,8 @@ private:
 	float foundTimer_;
 
 	int imgExclamation_;
+
+	bool isNestWait_;
 
 };
 

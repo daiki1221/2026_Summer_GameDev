@@ -81,6 +81,5 @@ private:
 	int imgDuckling_;
 
 	int bgmHandle_;
-
 	
 };
