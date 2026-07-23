@@ -76,6 +76,10 @@ void ResourceManager::Init(void)
 	// ひなアイコン
 	res = new RES(RES_T::IMG, PATH_IMG + "Duckling.png");
 	resourcesMap_.emplace(SRC::DUCKLING_IMG, res);
+
+	// チュートリアル
+	res = new RES(RES_T::IMG, PATH_IMG + "Tutorial.png");
+	resourcesMap_.emplace(SRC::TUTORIAL, res);
 }
 
 void ResourceManager::Release(void)

@@ -24,8 +24,14 @@ int WINAPI WinMain(
 		return -1;
 	}
 
+	int bgm_ = LoadSoundMem("Data/Sound/TitleBGM.wav");
+	PlaySoundMem(bgm_, DX_PLAYTYPE_LOOP, TRUE);
+
 	// Às
 	instance.Run();
+
+	StopSoundMem(bgm_);
+	DeleteSoundMem(bgm_);
 
 	// ‰ğ•ú
 	instance.Destroy();

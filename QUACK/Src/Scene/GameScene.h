@@ -81,5 +81,8 @@ private:
 	int imgDuckling_;
 
 	int bgmHandle_;
+
+	bool isTutorial_;
+	int imgTutorial_;
 	
 };

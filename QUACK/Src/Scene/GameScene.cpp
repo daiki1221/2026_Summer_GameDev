@@ -39,6 +39,11 @@ void GameScene::Init(void)
 	// マウスカーソルを非表示
 	SetMouseDispFlag(FALSE);
 
+	isTutorial_ = true;
+
+	// チュートリアル画像の読み込み
+	imgTutorial_ = ResourceManager::GetInstance().Load(ResourceManager::SRC::TUTORIAL).handleId_;
+
 	// 以下、既存処理
 	pattern = rand() % patterns.size();
 
@@ -120,6 +125,21 @@ void GameScene::Init(void)
 void GameScene::Update(void)
 {
 	auto const& ins = InputManager::GetInstance();
+	// マウス位置取得
+	int mouseX;
+	int mouseY;
+
+	GetMousePoint(&mouseX, &mouseY);
+	// チュートリアル表示中
+	if (isTutorial_)
+	{
+		if (ins.IsTrgDown(KEY_INPUT_SPACE) ||
+			 (GetMouseInput() & MOUSE_INPUT_LEFT))
+		{
+			isTutorial_ = false;
+		}
+		return;
+	}
 
 	pauseScene_->Update();
 
@@ -256,7 +276,7 @@ void GameScene::Update(void)
 
 void GameScene::Draw(void)
 {
-	
+
 	// ステージの描画
 	stage_->Draw();
 
@@ -386,6 +406,29 @@ void GameScene::Draw(void)
 
 	pauseScene_->Draw();
 
+	// チュートリアル表示中
+	if (isTutorial_)
+	{
+		// 少し暗くする
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
+
+		DrawBox(
+			0,
+			0,
+			Application::SCREEN_SIZE_X,
+			Application::SCREEN_SIZE_Y,
+			GetColor(0, 0, 0),
+			TRUE);
+
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		DrawGraph(
+			(Application::SCREEN_SIZE_X - 800) / 2,
+			(Application::SCREEN_SIZE_Y - 400) / 2,
+			imgTutorial_,
+			TRUE);
+
+	}
 
 
 }
