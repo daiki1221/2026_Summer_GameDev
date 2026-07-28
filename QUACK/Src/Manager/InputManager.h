@@ -51,6 +51,7 @@ public:
 		DOWN,
 		R_TRIGGER,
 		L_TRIGGER,
+		START,
 		MAX
 	};
 
@@ -128,6 +129,9 @@ public:
 	// アナログキーの入力値から方向(正規化済み)を取得
 	VECTOR GetDirectionXZAKey(int aKeyX, int aKeyY) const;
 
+	bool IsMouseTrgDown(int button);
+
+	bool oldMouse_ = false;
 private:
 
 	// キー情報

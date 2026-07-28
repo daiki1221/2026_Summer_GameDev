@@ -216,6 +216,36 @@ void Camera::ProcessRot(void)
 		}
 	}
 
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	// -1.0 Å` 1.0 Ç…ê≥ãKâª
+	float rx = static_cast<float>(padState.AKeyRX) / InputManager::AKEY_VAL_MAX;
+	float ry = static_cast<float>(padState.AKeyRY) / InputManager::AKEY_VAL_MAX;
+
+	// ÉfÉbÉhÉ]Å[Éì
+	if (fabs(rx) > 0.2f)
+	{
+		angles_.y += rx * 0.05f;   // ç∂âEâÒì]
+	}
+
+	if (fabs(ry) > 0.2f)
+	{
+		angles_.x += ry * 0.05f;   // è„â∫âÒì]
+	}
+
+	// è„â∫êßå¿
+	if (angles_.x > LIMIT_X_UP_RAD)
+	{
+		angles_.x = LIMIT_X_UP_RAD;
+	}
+
+	if (angles_.x < -LIMIT_X_DW_RAD)
+	{
+		angles_.x = -LIMIT_X_DW_RAD;
+	}
+
+
 	if (!isMouseControl_)
 	{
 

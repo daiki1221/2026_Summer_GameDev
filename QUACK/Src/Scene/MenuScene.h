@@ -23,7 +23,6 @@ public:
 private:
 	int menuImage_;
 	int menuImagePushed_;
-	int guideImage_ = -1;      // 操作ガイド画像のハンドル
 	int selectorImage_ = -1; // 選択中枠画像のハンドル
 	bool isGuideOpen_ = false;	// メニューが開いているかどうか
 	int selectedIndex_ = 0; // 現在選択中のボタンint sele
@@ -38,6 +37,9 @@ private:
 	InputManager* inputManager_;
 	SceneManager* sceneManager_;
 
+	int guideImage_[2];
+
+	bool isSecondPage_ = false;
 
 
 };

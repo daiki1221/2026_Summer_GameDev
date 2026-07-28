@@ -69,7 +69,7 @@ void Player::Init(void)
 
 	// カプセルコライダ
 	capsule_ = std::make_unique<Capsule>(transform_);
-	capsule_->SetLocalPosTop({ 0.0f, 40.0f, 0.0f });
+	capsule_->SetLocalPosTop({ 0.0f, 110, 0.0f });
 	capsule_->SetLocalPosDown({ 0.0f, 30.0f, 0.0f });
 	capsule_->SetRadius(15.0f);
 
@@ -417,53 +417,110 @@ void Player::ProcessMove(void)
 	double rotRad = 0;
 
 	VECTOR dir = AsoUtility::VECTOR_ZERO;
-	
-	// カメラ方向に前進したい
-	if (ins.IsNew(KEY_INPUT_W))
-	{
-		rotRad = AsoUtility::Deg2RadD(0.0);
-		dir = cameraRot.GetForward();
-	}
 
-	// カメラ方向から後退したい
-	if (ins.IsNew(KEY_INPUT_S))
-	{
-		rotRad = AsoUtility::Deg2RadD(180.0);
-		dir = cameraRot.GetBack();
-	}
+	if (GetJoypadNum() == 0) {
 
-	// カメラ方向から右側へ移動したい
-	if (ins.IsNew(KEY_INPUT_D))
-	{
-		rotRad = AsoUtility::Deg2RadD(90.0);
-		dir = cameraRot.GetRight();
-	}
-
-	// カメラ方向から左側へ移動したい
-	if (ins.IsNew(KEY_INPUT_A))
-	{
-		rotRad = AsoUtility::Deg2RadD(270.0);
-		dir = cameraRot.GetLeft();
-	}
-
-	if (!AsoUtility::EqualsVZero(dir) && (isJump_ || IsEndLanding())) {
-
-		// 移動処理
-		speed_ = SPEED_MOVE;
-		if (ins.IsNew(KEY_INPUT_LSHIFT))
+		// カメラ方向に前進したい
+		if (ins.IsNew(KEY_INPUT_W))
 		{
-			speed_ = SPEED_RUN;
+			rotRad = AsoUtility::Deg2RadD(0.0);
+			dir = cameraRot.GetForward();
 		}
+
+		// カメラ方向から後退したい
+		if (ins.IsNew(KEY_INPUT_S))
+		{
+			rotRad = AsoUtility::Deg2RadD(180.0);
+			dir = cameraRot.GetBack();
+		}
+
+		// カメラ方向から右側へ移動したい
+		if (ins.IsNew(KEY_INPUT_D))
+		{
+			rotRad = AsoUtility::Deg2RadD(90.0);
+			dir = cameraRot.GetRight();
+		}
+
+		// カメラ方向から左側へ移動したい
+		if (ins.IsNew(KEY_INPUT_A))
+		{
+			rotRad = AsoUtility::Deg2RadD(270.0);
+			dir = cameraRot.GetLeft();
+		}
+
+	}
+	else
+	{
+		// 接続されているゲームパッド１の情報を取得
+		InputManager::JOYPAD_IN_STATE padState =
+			ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+		// 左スティック入力取得（ローカル方向）
+		VECTOR stickDir = ins.GetDirectionXZAKey(
+			padState.AKeyLX,
+			padState.AKeyLY);
+
+
+		// カメラ方向に合わせる
+		if (!AsoUtility::EqualsVZero(stickDir))
+		{
+			// カメラの前方向・右方向を取得
+			VECTOR forward = cameraRot.GetForward();
+			VECTOR right = cameraRot.GetRight();
+
+			// Yを消してXZ平面だけにする
+			forward.y = 0.0f;
+			right.y = 0.0f;
+
+			forward = VNorm(forward);
+			right = VNorm(right);
+
+
+			// スティック入力をカメラ基準へ変換
+			dir =
+				VAdd(
+					VScale(forward, stickDir.z),
+					VScale(right, stickDir.x)
+				);
+
+
+			// 向きを計算
+			rotRad = atan2(dir.x, dir.z);
+		}
+	}
+
+	if (!AsoUtility::EqualsVZero(dir) && (isJump_ || IsEndLanding()))
+	{
+		// 移動
+		speed_ = SPEED_MOVE;
+
+		if (GetJoypadNum() == 0)
+		{
+			// キーボード
+			if (ins.IsNew(KEY_INPUT_LSHIFT))
+			{
+				speed_ = SPEED_RUN;
+			}
+		}
+		else
+		{
+			// パッド
+			if (ins.IsPadBtnNew(
+				InputManager::JOYPAD_NO::PAD1,
+				InputManager::JOYPAD_BTN::L_TRIGGER))
+			{
+				speed_ = SPEED_RUN;
+			}
+		}
+
 		moveDir_ = dir;
 		movePow_ = VScale(dir, speed_);
 
-		// 回転処理
 		SetGoalRotate(rotRad);
 
 		if (!isJump_ && IsEndLanding())
 		{
-			// アニメーション
-			if (ins.IsNew(KEY_INPUT_LSHIFT))
+			if (speed_ == SPEED_RUN)
 			{
 				animationController_->Play((int)ANIM_TYPE::FAST_RUN);
 			}
@@ -472,7 +529,6 @@ void Player::ProcessMove(void)
 				animationController_->Play((int)ANIM_TYPE::RUN);
 			}
 		}
-
 	}
 	else
 	{
@@ -528,14 +584,23 @@ void Player::ProcessAtttack(void)
 {
 	auto& ins = InputManager::GetInstance();
 
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
 	// 右クリック：照準ON（表示だけ）
-	if (ins.IsTrgMouseRight())
+	if (ins.IsTrgMouseRight() ||
+		ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::LEFT))
 	{
 		isAiming_ = !isAiming_; // トグルでもOK
 	}
 
 	// 左クリック：発射（常に現在カメラ方向）
-	if (ins.IsTrgMouseLeft())
+	if (ins.IsTrgMouseLeft() ||
+		ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::R_TRIGGER))
 	{
 		VECTOR dir = SceneManager::GetInstance()
 			.GetCamera()

@@ -124,7 +124,11 @@ void GameScene::Init(void)
 
 void GameScene::Update(void)
 {
-	auto const& ins = InputManager::GetInstance();
+	auto& ins = InputManager::GetInstance();
+
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
 	// マウス位置取得
 	int mouseX;
 	int mouseY;
@@ -134,7 +138,10 @@ void GameScene::Update(void)
 	if (isTutorial_)
 	{
 		if (ins.IsTrgDown(KEY_INPUT_SPACE) ||
-			 (GetMouseInput() & MOUSE_INPUT_LEFT))
+			 (GetMouseInput() & MOUSE_INPUT_LEFT) ||
+			ins.IsPadBtnTrgDown(
+				InputManager::JOYPAD_NO::PAD1,
+				InputManager::JOYPAD_BTN::RIGHT))
 		{
 			isTutorial_ = false;
 		}
@@ -238,7 +245,10 @@ void GameScene::Update(void)
 
 	float dist = VSize(VSub(player_->GetPos(), nestPos));
 
-	if (ins.IsTrgDown(KEY_INPUT_F))
+	if (ins.IsTrgDown(KEY_INPUT_F) ||
+		ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::DOWN))
 	{
 		// 3匹連れていて、巣の近くなら預ける
 		if (followingCount == 3 && dist < 150.0f)

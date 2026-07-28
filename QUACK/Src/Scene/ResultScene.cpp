@@ -33,7 +33,12 @@ void ResultScene::Init(void)
 
 void ResultScene::Update(void)
 {
-	if (InputManager::GetInstance().IsNew(KEY_INPUT_SPACE)) {
+	auto& ins = InputManager::GetInstance();
+
+	if (InputManager::GetInstance().IsNew(KEY_INPUT_SPACE) ||
+		ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::RIGHT)) {
 		SceneManager::GetInstance().ChangeScene(SceneManager::SCENE_ID::TITLE);
 	}
 }

@@ -39,7 +39,7 @@ public:
 	bool IsPause() const;
 
 private:
-
+	bool usePad_;
 	bool isPause_;
 
 	PAUSE_SELECT pauseSelect_;

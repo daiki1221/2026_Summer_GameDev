@@ -62,7 +62,7 @@ void Enemy::Init(void)
 	capsule_->SetRadius(20.0f);
 
 	targetPos_ = transform_.pos;
-	targetPos_.y = -80.0f;
+	targetPos_.y = -150.0f;
 	targetTimer_ = 0.0f;
 
 	hp_ = 100;
@@ -358,7 +358,7 @@ void Enemy::UpdatePlay(void)
 		speed_ = 10.0f;
 		movePow_ = VScale(away, speed_);
 
-		float dist = transform_.pos.y - player_->GetPos().y;
+		float dist = transform_.pos.y - player_->GetPos().y-150;
 
 		if (dist >= RECOVER_DISTANCE)
 		{

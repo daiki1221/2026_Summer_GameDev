@@ -310,6 +310,9 @@ InputManager::JOYPAD_IN_STATE InputManager::GetJPadInputState(JOYPAD_NO no)
 		idx = static_cast<int>(JOYPAD_BTN::L_TRIGGER);
 		ret.ButtonsNew[idx] = x.LeftTrigger; // L_TRIGGER
 
+		idx = static_cast<int>(JOYPAD_BTN::START);
+		ret.ButtonsNew[idx] = d.Buttons[9];
+
 		// 左スティック
 		ret.AKeyLX = d.X;
 		ret.AKeyLY = d.Y;
@@ -348,6 +351,9 @@ InputManager::JOYPAD_IN_STATE InputManager::GetJPadInputState(JOYPAD_NO no)
 
 		idx = static_cast<int>(JOYPAD_BTN::L_TRIGGER);
 		ret.ButtonsNew[idx] = d.Buttons[6]; // L_TRIGGER
+
+		idx = static_cast<int>(JOYPAD_BTN::START);
+		ret.ButtonsNew[idx] = d.Buttons[9];
 
 		// 左スティック
 		ret.AKeyLX = d.X;
@@ -423,4 +429,15 @@ VECTOR InputManager::GetDirectionXZAKey(int aKeyX, int aKeyY) const
 
 	return ret;
 
+}
+
+bool InputManager::IsMouseTrgDown(int button)
+{
+	bool now = GetMouseInput() & button;
+
+	bool trg = now && !oldMouse_;
+
+	oldMouse_ = now;
+
+	return trg;
 }

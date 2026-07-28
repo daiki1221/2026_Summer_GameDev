@@ -38,14 +38,26 @@ void TitleScene::Init(void)
 void TitleScene::Update(void)
 {
 
-	auto const& ins = InputManager::GetInstance();
+	auto& ins = InputManager::GetInstance();
+
+	// 接続されているゲームパッド１の情報を取得
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	VECTOR stick = ins.GetDirectionXZAKey(
+		padState.AKeyLX,
+		padState.AKeyLY);
+
+	bool stickUp = stick.z > 0.7f;
+	bool stickDown = stick.z < -0.7f;
+
+	if (GetJoypadNum() == 0) {
 
 	// マウス位置取得
 	int mouseX;
 	int mouseY;
 
 	GetMousePoint(&mouseX, &mouseY);
-
 
 	// マウスで選択
 	for (int i = 0; i < 3; i++)
@@ -56,94 +68,102 @@ void TitleScene::Update(void)
 		}
 	}
 
-
-	// クリック決定
-	if (GetMouseInput() & MOUSE_INPUT_LEFT)
-	{
-		switch (select_)
+	
+		// クリック決定
+		if (GetMouseInput() & MOUSE_INPUT_LEFT ||
+			ins.IsTrgDown(KEY_INPUT_SPACE))
 		{
-		case SELECT::START:
+			switch (select_)
+			{
+			case SELECT::START:
 
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+				sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 
-			break;
-
-
-		case SELECT::GUIDE:
-
-			// 操作説明シーンへ
-			sceMng_.OpenMenu();
-
-			break;
+				break;
 
 
-		case SELECT::END:
+			case SELECT::GUIDE:
 
-			DxLib_End();
+				// 操作説明シーンへ
+				sceMng_.OpenMenu();
 
-			break;
+				break;
+
+
+			case SELECT::END:
+
+				DxLib_End();
+
+				break;
+			}
 		}
 	}
-
-	// 上選択
-	if (ins.IsTrgDown(KEY_INPUT_UP))
+	else
 	{
-		int num = (int)select_;
 
-		num--;
-
-		if (num < 0)
+		// 上選択
+		if (stickUp && !stickUpOld_)
 		{
-			num = 2;
+			int num = (int)select_;
+
+			num--;
+
+			if (num < 0)
+			{
+				num = 2;
+			}
+
+			select_ = (SELECT)num;
 		}
 
-		select_ = (SELECT)num;
-	}
 
-
-	// 下選択
-	if (ins.IsTrgDown(KEY_INPUT_DOWN))
-	{
-		int num = (int)select_;
-
-		num++;
-
-		if (num > 2)
+		// 下選択
+		if (stickDown && !stickDownOld_)
 		{
-			num = 0;
+			int num = (int)select_;
+
+			num++;
+
+			if (num > 2)
+			{
+				num = 0;
+			}
+
+			select_ = (SELECT)num;
 		}
 
-		select_ = (SELECT)num;
-	}
 
-
-	// 決定
-	if (ins.IsTrgDown(KEY_INPUT_SPACE))
-	{
-		switch (select_)
+		// 決定
+		if (ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::RIGHT))
 		{
-		case SELECT::START:
+			switch (select_)
+			{
+			case SELECT::START:
 
-			sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
+				sceMng_.ChangeScene(SceneManager::SCENE_ID::GAME);
 
-			break;
-
-
-		case SELECT::GUIDE:
-
-			// 操作説明シーンへ
-			sceMng_.OpenMenu();
-
-			break;
+				break;
 
 
-		case SELECT::END:
+			case SELECT::GUIDE:
 
-			DxLib_End();
-			break;
+				// 操作説明シーンへ
+				sceMng_.OpenMenu();
+
+				break;
+
+
+			case SELECT::END:
+
+				DxLib_End();
+				break;
+			}
 		}
+		stickUpOld_ = stickUp;
+		stickDownOld_ = stickDown;
 	}
-
 }
 
 void TitleScene::Draw(void)

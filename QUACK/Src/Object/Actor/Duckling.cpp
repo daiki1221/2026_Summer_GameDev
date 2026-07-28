@@ -108,10 +108,11 @@ void Duckling::Draw(void)
 			imgExclamation_,
 			TRUE);
 
+		SetFontSize(32);
 		DrawString(
 			Application::SCREEN_SIZE_X / 2 - 40,
 			Application::SCREEN_SIZE_Y - 80,
-			"F : Ç–Ç»ÇèïÇØÇÈ",
+			"Ç–Ç»ÇèïÇØÇÊÇ§ÅI",
 			GetColor(255, 255, 255));
 
 	}

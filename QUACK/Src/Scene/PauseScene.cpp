@@ -2,6 +2,7 @@
 #include "../Application.h"
 #include "../Manager/SceneManager.h"
 #include "../Manager/InputManager.h"
+#include "../Utility/AsoUtility.h"
 #include "../Manager/Camera.h"
 #include "PauseScene.h"
 
@@ -30,6 +31,8 @@ void PauseScene::Init(void)
 	imgPauseMenu_[1] = LoadGraph("Data/Image/Menu/guide.png");
 	imgPauseMenu_[2] = LoadGraph("Data/Image/Menu/title,.png");
 	guideImage_ = LoadGraph("Data/Image/Menu/sousa.png");
+
+	usePad_ = false;
 }
 
 void PauseScene::Update(void)
@@ -37,7 +40,21 @@ void PauseScene::Update(void)
 	auto& ins =
 		InputManager::GetInstance();
 
-	if (ins.IsTrgDown(KEY_INPUT_TAB))
+	InputManager::JOYPAD_IN_STATE padState =
+		ins.GetJPadInputState(InputManager::JOYPAD_NO::PAD1);
+
+	VECTOR stick = ins.GetDirectionXZAKey(
+		padState.AKeyLX,
+		padState.AKeyLY);
+
+	bool stickUp = stick.z > 0.7f;
+	bool stickDown = stick.z < -0.7f;
+
+
+	if (ins.IsTrgDown(KEY_INPUT_TAB)|| 
+		ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::TOP))
 	{
 		isPause_ = !isPause_;
 
@@ -52,70 +69,97 @@ void PauseScene::Update(void)
 	if (!isPause_)
 		return;
 
+	static bool stickUpOld = false;
+	static bool stickDownOld = false;
+
+	if (stickUp && !stickUpOld)
+	{
+		int num = (int)pauseSelect_;
+		num--;
+		if (num < 0) num = 2;
+		pauseSelect_ = (PAUSE_SELECT)num;
+	}
+
+	if (stickDown && !stickDownOld)
+	{
+		int num = (int)pauseSelect_;
+		num++;
+		if (num > 2) num = 0;
+		pauseSelect_ = (PAUSE_SELECT)num;
+	}
+
+	stickUpOld = stickUp;
+	stickDownOld = stickDown;
+
 	// 操作説明表示中
 	if (isGuide_)
 	{
-		if (ins.IsTrgDown(KEY_INPUT_SPACE))
+		if (ins.IsTrgDown(KEY_INPUT_SPACE) ||
+			ins.IsPadBtnTrgDown(
+				InputManager::JOYPAD_NO::PAD1,
+				InputManager::JOYPAD_BTN::RIGHT))
 		{
 			isGuide_ = false;
 		}
 
 		return;
 	}
-
-		for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
+	{
+		if (IsMouseOnPauseMenu(i))
 		{
-			if (IsMouseOnPauseMenu(i))
-			{
-				pauseSelect_ = (PAUSE_SELECT)i;
-			}
+			pauseSelect_ = (PAUSE_SELECT)i;
 		}
-
-		static int oldMouse = 0;
-
-		int mouse = GetMouseInput();
-
-		bool click =
-			(mouse & MOUSE_INPUT_LEFT) &&
-			!(oldMouse & MOUSE_INPUT_LEFT);
-
-		oldMouse = mouse;
-
-		if (click)
-		{
-			switch (pauseSelect_)
-			{
-
-			case PAUSE_SELECT::RESUME:
-
-				isPause_ = false;
-
-				SceneManager::GetInstance()
-					.GetCamera()
-					->SetMouseControl(false);
-
-				SetMouseDispFlag(false);
-
-				break;
-
-
-			case PAUSE_SELECT::GUIDE:
-
-				// 操作説明シーンへ
-				isGuide_ = true;
-				break;
-
-
-			case PAUSE_SELECT::TITLE:
-
-				SceneManager::GetInstance()
-					.ChangeScene(
-						SceneManager::SCENE_ID::TITLE);
-				break;
-			}
-		}
-		return;
 	}
+
+	static int oldMouse = 0;
+
+	int mouse = GetMouseInput();
+
+	bool click =
+		(mouse & MOUSE_INPUT_LEFT) &&
+		!(oldMouse & MOUSE_INPUT_LEFT);
+
+	oldMouse = mouse;
+
+	if (click ||
+		ins.IsPadBtnTrgDown(
+			InputManager::JOYPAD_NO::PAD1,
+			InputManager::JOYPAD_BTN::RIGHT))
+	{
+		switch (pauseSelect_)
+		{
+
+		case PAUSE_SELECT::RESUME:
+
+			isPause_ = false;
+
+			SceneManager::GetInstance()
+				.GetCamera()
+				->SetMouseControl(false);
+
+			SetMouseDispFlag(false);
+
+			break;
+
+
+		case PAUSE_SELECT::GUIDE:
+
+			// 操作説明シーンへ
+			isGuide_ = true;
+			break;
+
+
+		case PAUSE_SELECT::TITLE:
+
+			SceneManager::GetInstance()
+				.ChangeScene(
+					SceneManager::SCENE_ID::TITLE);
+			break;
+		}
+	}
+	return;
+}
 
 void PauseScene::Draw(void)
 {
@@ -165,15 +209,22 @@ void PauseScene::DrawPauseMenu(void)
 	{
 		int y = pauseMenuY_[i];
 
-		bool hover =
-			IsMouseOnPauseMenu(i);
+		bool hover = IsMouseOnPauseMenu(i);
+		bool selected = (pauseSelect_ == (PAUSE_SELECT)i);
 
-		DrawGraph(
-			x,
-			y,
+		// 選択中またはマウスが乗っているときだけ拡大
+		float scale = (selected || hover) ? 1.1f : 1.0f;
+
+		int w, h;
+		GetGraphSize(imgPauseMenu_[i], &w, &h);
+
+		DrawRotaGraph(
+			x + w / 2,
+			y + h / 2,
+			scale,
+			0.0,
 			imgPauseMenu_[i],
 			TRUE);
-
 	}
 }
 

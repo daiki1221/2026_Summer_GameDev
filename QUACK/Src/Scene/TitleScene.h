@@ -45,4 +45,7 @@ private:
 	int startImg_;
 	int guideImg_;
 	int endImg_;
+
+	bool stickUpOld_ = false;
+	bool stickDownOld_ = false;
 };
